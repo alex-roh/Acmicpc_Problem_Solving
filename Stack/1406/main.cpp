@@ -1,19 +1,23 @@
 #include <iostream>
 #include <string>
-#include <stack>
+#include <list>
 
 using namespace std;
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	
 	string sentence;
 	getline(cin, sentence);
 	
 	// add "start" indicator to the string
 	sentence = "&" + sentence;
-	string::iterator cursor = sentence.end();
+	
+	list<char> mylist;	
+	for(int i = 0; i < sentence.size(); i++) mylist.push_back(sentence[i]);
+	
+	list<char>::iterator cursor = mylist.end();
 	cursor--;
 	
 	int cnt;
@@ -22,38 +26,34 @@ int main(int argc, char** argv) {
 	
 	while(cnt--){
 		
+		if(cursor == mylist.end()) cursor--;
+		
 		string operation;
 		getline(cin, operation);
 		
 		if(operation == "L"){
 			// move cursor to the left
-			if(*cursor != '&') cursor--;			
+			if(*cursor != '&') cursor--;
 		}
 		else if(operation == "D"){
 			// move cursor to the right
-			if(cursor != sentence.end()) cursor++;
-			if(cursor == sentence.end()) cursor--;
-			
+			if(cursor != mylist.end()) cursor++;
 		}
 		else if(operation == "B"){
-			// erase a character left to the cursor
+			// erase a character that is left to the cursor
 			if(*cursor != '&'){
-				cout << "to be erased : " << *cursor << "\n";
-				sentence.erase(cursor);
+				cursor = mylist.erase(cursor);
 				cursor--;
 			}
 		}
 		else if (operation[0] == 'P'){
-			cursor++;
-			sentence.insert(cursor, operation[2]);
+			cursor = mylist.insert(++cursor, operation[2]);
 		}
-		
-		cout << "operation is " << operation << ", sentence is " << sentence << ", cursor is " << *cursor << "\n";
-	
 	}
 	
-	sentence.erase(0, 1);
-	cout << sentence;
+	mylist.pop_front();
+	for(list<char>::iterator iter = mylist.begin(); iter != mylist.end(); iter++)
+		cout << *iter;
 	
 	return 0;
 }
