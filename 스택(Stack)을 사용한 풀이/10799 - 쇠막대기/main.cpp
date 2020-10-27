@@ -6,7 +6,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
 	
-	freopen("in2.txt", "rt", stdin);
+	// freopen("in2.txt", "rt", stdin);
 	
 	string str;
 	getline(cin, str);
