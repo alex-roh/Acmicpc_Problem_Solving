@@ -10,7 +10,7 @@ void factorization(int n){
 	
 	int cur = n;
 	
-	for(int i = 2; i <= cur;){	
+	for(int i = 2; i <= n;){	
 		if(cur <= 1) break;
 		if(cur % i == 0){
 			cur /= i;
