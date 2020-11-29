@@ -7,7 +7,7 @@ int DP(int n){
 	
 	vector<int> D(n + 1);
 	
-	D[0] = 0;
+	D[0] = 1;
 	D[1] = 1;
 	D[2] = 2;
 	D[3] = 4;
@@ -23,7 +23,7 @@ int DP(int n){
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
