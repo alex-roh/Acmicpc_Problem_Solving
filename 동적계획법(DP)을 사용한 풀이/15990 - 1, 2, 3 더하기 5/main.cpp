@@ -1,8 +1,7 @@
 #include <iostream>
-#include <vector>
 
 // D[i][j] : i를 나타내는데 마지막 수를 j로 사용한 경우의 수 
-long long D[100001][4];
+long long D[100002][4];
 
 using namespace std;
 
@@ -44,11 +43,11 @@ int main(int argc, char** argv) {
 	
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
+
+	DP();
 	
 	int testCnt;
 	cin >> testCnt;
-	
-	DP();
 	
 	while(testCnt--){
 		int n;
