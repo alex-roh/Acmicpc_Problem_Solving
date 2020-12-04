@@ -8,7 +8,7 @@ long long D[301][2];
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
@@ -37,9 +37,6 @@ int main(int argc, char** argv) {
 			D[n][0] = max(D[n-2][1], D[n-2][0]) + S[n];
 		
 		}
-		
-		cout << "D[" << n << "][1] = " << D[n][1] << "\n";
-		cout << "D[" << n << "][0] = " << D[n][0] << "\n";
 		
 	}
 	
