@@ -18,7 +18,7 @@ bool canGoToChannel(string channel){
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
@@ -51,11 +51,8 @@ int main(int argc, char** argv) {
 		// - 혹은 + 버튼을 더 눌러서 도착한 경우의 cnt
 		cnt += abs(N - stoi(channel));
 		
-		cout << "channel is " << channel << ",  cnt is " << cnt << "\n";
-		
 		if(minCnt > cnt){
 			minCnt = cnt;
-			cout << "channel is " << channel << ",  minCnt is " << minCnt << "\n";
 		}
 		
 	}
