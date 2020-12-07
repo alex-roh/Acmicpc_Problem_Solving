@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 		cin >> M >> N >> x >> y;
 		
 		int changingY, index;
-		for(index = x; index <= 1600000000; index += M){
+		for(index = x; index <= M * N; index += M){
 			
 			changingY = index % N;
 			
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 			}
 		}
 		
-		if(index > 40000){
+		if(index > M * N){
 			cout << -1 << "\n";
 		}
 		else {
