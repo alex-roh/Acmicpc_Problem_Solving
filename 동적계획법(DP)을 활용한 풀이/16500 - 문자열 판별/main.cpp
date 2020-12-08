@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 	// O(L * N)
 	for(int i = L - 1; i >= 0; i--){
 		
-		string toBeMatched = S.substr(1, i - 1);
+		string assumeAsMatched = S.substr(1, i - 1);
 		string canBeWord;
 		
 		for(int j = i; j < L; j++){
