@@ -6,7 +6,7 @@
 using namespace std;
 
 // D[N] : N만큼의 무게가 가방에 남았을 때 담을 수 있는 최댓값
-int D[10000000];
+int D[100001];
 bool selected[101]; 
 vector<pair<int, int>> items(101); // first - weight, second - value
 int N, K;
@@ -47,7 +47,7 @@ void DFS(int remainingWeight, int value){
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
