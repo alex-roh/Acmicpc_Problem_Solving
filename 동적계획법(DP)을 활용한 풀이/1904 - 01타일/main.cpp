@@ -3,6 +3,7 @@
 using namespace std;
 
 int D[1000001];
+int mod = 15746;
 
 int main(int argc, char** argv) {
 	
@@ -16,7 +17,7 @@ int main(int argc, char** argv) {
 	D[1] = 1;
 	
 	for(int i = 2; i <= N; i++){
-		D[i] = D[i - 1] + D[i - 2];
+		D[i] = (D[i - 1] + D[i - 2]) % mod;
 	}
 	
 	cout << D[N];
