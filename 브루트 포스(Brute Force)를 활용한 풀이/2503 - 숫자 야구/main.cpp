@@ -8,7 +8,7 @@
 
 using namespace std;
 
-int numbers [1001][4];
+int numbers [1001][4]; 
 int res; 
 
 int main(int argc, char** argv) {
@@ -58,12 +58,10 @@ int main(int argc, char** argv) {
 			}
 			
 			if(currentStrike == strike && currentBall == ball){
-				cout << i << " matches with " << input << "\n";
 				numbers[i][ANSCNT]++;
 			}	
 			
 		}
-		cout << "\n\n*******\n\n";
 	}
 	
 	// 정답이라면 지금까지 누적된 strike 수와 ball 수가 같아야 함 

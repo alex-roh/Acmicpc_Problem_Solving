@@ -1,6 +1,6 @@
 [Project]
-FileName=2503.dev
-Name=2503
+FileName=1018.dev
+Name=1018
 Type=1
 Ver=2
 ObjFiles=
@@ -29,7 +29,6 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000001000000
-UnitCount=0
 
 [VersionInfo]
 Major=1
