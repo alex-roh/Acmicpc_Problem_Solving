@@ -32,16 +32,16 @@ bool check(int index){
 	
 }
 
-int findSequenceRecursive(int index){
+void findSequenceRecursive(int index){
 	
-	cout << "findSequenceRecursive(" << index << ")\n";
+	if(isPrinted) return;
 	
 	if(index > N){
 		for(int i = 1; i <= N; i++){
 			cout << sequence[i] << " ";
 		}
 		cout << "\n";
-		return 10;
+		// isPrinted = true;
 	}
 	else {
 		
@@ -63,11 +63,9 @@ int findSequenceRecursive(int index){
 			else 
 				sequence[index] = i;
 			
-			if(check(index) && (findSequenceRecursive(index + 1) == 10))
-				return 10;
+			if(check(index))
+				findSequenceRecursive(index + 1);
 		}
-		
-		return -1;
 	}
 }
 
