@@ -51,13 +51,26 @@ int D[16][1 << 16];
 // current 도시에서 visited 도시를 제외하고 순회했을 때의 최단거리를 반환 
 int TSP(int current, int visited){
 	
+	cos("current city"); cos(current); cos(","); col("already visited:");
+	rep(i, 0, N){
+		if((visited & (1 << i)) != 0)
+			cos(i); // 1을 더해서 출력해야 함
+	}
+	cl;
+	
 	int &cachedMinCost = D[current][visited];
 	
 	// 이미 최단거리를 찾은 경우 반환 
-	if(cachedMinCost != -1) return cachedMinCost;
+	if(cachedMinCost != -1) {
+		col("already cached");
+		cl;
+		return cachedMinCost;	
+	}
 	
 	// 모든 도시를 방문했으면 재귀호출 종료 
 	if(visited == ((1 << N) - 1)){
+		col("end of the recursive call");
+		cl;
 		// 첫번째 도시와 사이클 형성이 되는지 검사
 		if(W[current][0] != 0){
 			return W[current][0];
@@ -66,6 +79,9 @@ int TSP(int current, int visited){
 			return INF;
 		}
 	}
+	
+	col("will visit other cities");
+	cl;
 	
 	// 다른 도시를 순서대로 방문해보면서 cachedMonCost의 최소값을 찾음 
 	cachedMinCost = MAX;
@@ -103,7 +119,7 @@ int main(int argc, char** argv) {
 	rep(i, 0, N){
 		int minVal = MAX;
 		rep(j, 0, (1 << N)){
-			if(D[i][j] < minVal) minVal = D[i][j];
+			if(D[i][j] < minVal && D[i][j] != -1) minVal = D[i][j];
 		}
 		co("D["); co(i); co("]"); co(" = "); col(minVal);
 	}
