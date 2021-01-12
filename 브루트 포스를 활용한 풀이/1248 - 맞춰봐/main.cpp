@@ -41,7 +41,7 @@ void findSequenceRecursive(int index){
 			cout << sequence[i] << " ";
 		}
 		cout << "\n";
-		// isPrinted = true;
+		isPrinted = true;
 	}
 	else {
 		
@@ -92,3 +92,4 @@ int main(int argc, char** argv) {
 	return 0;
 
 }
+
