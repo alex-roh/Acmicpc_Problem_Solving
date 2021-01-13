@@ -41,16 +41,15 @@ const int MAX = 2000000000;
 using namespace std;
 
 int V, E;
+vi adjList[20001];
+bool visited[20001];
+int color[20001];
+qi que;
 
-string BFS(int startVertex, array<vi, 20001>& adjList){
-	
-	vb visited(V + 1, false);
-	vi color(V + 1, -1);
-	
-	qi que;
+string BFS(int startVertex){
 	
 	visited[startVertex] = true;
-	color[startVertex] = 0; // 색을 칠해서 넣음 
+	color[startVertex] = 1; // 색을 칠해서 넣음 
 	que.push(startVertex);
 	
 	while(!que.empty()){
@@ -61,15 +60,23 @@ string BFS(int startVertex, array<vi, 20001>& adjList){
 		rep(i, 0, adjList[currentVertex].size()){
 			
 			int nextVertex = adjList[currentVertex][i];
-			
+				
 			// 다음 정점에 이미 색이 칠해져 있고 내 색과 일치하는 경우 
-			if(color[nextVertex] != -1 && color[currentVertex] == color[nextVertex]){
+			if(color[nextVertex] != 0 && color[currentVertex] == color[nextVertex]){
 				return "NO";
 			}
 			
 			if(visited[nextVertex] == false){
 				
-				color[nextVertex] = color[currentVertex] ^ 1;
+				switch(color[currentVertex]){
+					case 1:
+						color[nextVertex] = 2;
+						break;
+					case 2:
+						color[nextVertex] = 1;
+						break;
+				}
+				
 				visited[nextVertex] = true;
 				que.push(nextVertex);
 				
@@ -77,13 +84,20 @@ string BFS(int startVertex, array<vi, 20001>& adjList){
 		}
 	}
 	
+	// 모든 정점을 탐색했는지 검사 
+	rep(i, 1, V + 1){
+		if(visited[i] == false && BFS(i) == "NO"){
+			return "NO";
+		}
+	} 
+	
 	return "YES";
 	
 }
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 
@@ -93,17 +107,23 @@ int main(int argc, char** argv) {
 	while(K--){
 		
 		ci2(V, E);
-		array<vi, 20001> adjList;
 		int src, dest;
 		
 		rep(i, 0, E){
-			int src, dest;
 			ci2(src, dest);
 			adjList[src].pb(dest);
 			adjList[dest].pb(src);
 		}
 		
-		col(BFS(src, adjList));
+		col(BFS(src));
+		
+		// adjList, que, visited, color 초기화
+		for(auto& v : adjList){
+			v.clear();
+		}
+		memset(visited, false, sizeof(visited));
+		memset(color, 0, sizeof(color));
+		qi().swap(que);
 		
 	}
 	
