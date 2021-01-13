@@ -38,36 +38,66 @@ const int MAX = 2000000000;
 
 using namespace std;
 
-int N, S;
-int seq[21];
-int pattern;
+int N, M;
+vi adjList[1001];
+bool visited[1001];
+int cnt;
+
+void DFS(int vertex){
+	
+	visited[vertex] = true;
+	cnt++;
+	
+	rep(i, 0, adjList[vertex].size()){
+		
+		int nextVertex = adjList[vertex][i];
+		
+		if(visited[nextVertex] == false){
+			DFS(nextVertex);
+		}
+	}
+	
+}
 
 int main(int argc, char** argv) {
 	
 	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
-	 
-	ci2(N, S);
 	
-	rep(i, 0, N){
-		ci(seq[i]);
-	}
+	ci2(N, M);
 	
-	int ans = 0;
+	int startVertex;
 	
-	// 비트마스크로 생성한 패턴에 맞추어 원소를 더함 
-	rep(pattern, 1, (1 << N)){
-		int sum = 0;
-		rep(i, 0, N){
-			if((pattern & (1 << i)) != 0){
-				sum += seq[i];	
+	rep(i, 0, M){
+		
+		int src, dest;
+		ci2(src, dest);
+		adjList[src].pb(dest);
+		adjList[dest].pb(src);
+		startVertex = src;
+		
+	}	
+	
+	DFS(startVertex);
+	
+	int vertexIndex = 0;
+	int ans = 1;
+	
+	while(cnt != N){
+		
+		rep(i, vertexIndex, N){
+			if(visited[i] == false){
+				vertexIndex = i;
 			}
 		}
-		if(sum == S) ans++;
+		
+		DFS(vertexIndex);
+		ans++;
 	}
 	
 	col(ans);
 	
 	return 0;
 }
+

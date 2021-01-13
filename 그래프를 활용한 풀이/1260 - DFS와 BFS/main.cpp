@@ -32,42 +32,82 @@ typedef stack<ll> sl;
 typedef queue<ll> ql;
 typedef priority_queue<ll> pql;
 
-int dx[4] = { 0,0,1,-1 };
-int dy[4] = { -1,1,0,0 };
+int dx[4] = { 0, 0, 1, -1 };
+int dy[4] = { -1, 1, 0, 0 };
 const int MAX = 2000000000;
 
 using namespace std;
 
-int N, S;
-int seq[21];
-int pattern;
+int N, M, V;
+vi adjList[1001];
+bool visitedDFS[1001];
+bool visitedBFS[1001];
+
+void dfs(int vertex){
+	
+	visitedDFS[vertex] = true;
+	cos(vertex);
+			
+	rep(i, 0, adjList[vertex].size()){
+		
+		int nextVertex = adjList[vertex][i];
+		
+		if(visitedDFS[nextVertex] == false){
+			dfs(nextVertex);
+		}
+		
+	}		
+
+}
+
+void bfs(int startVertex){
+	
+	qi que;
+	que.push(startVertex);
+	visitedBFS[startVertex] = true;
+	
+	while(!que.empty()){
+		
+		int cur = que.front();
+		que.pop();
+		cos(cur);
+		
+		rep(i, 0, adjList[cur].size())
+		{
+			int nextVertex = adjList[cur][i];
+			if(visitedBFS[nextVertex] == false){
+				visitedBFS[nextVertex] = true;
+				que.push(nextVertex);
+			}		
+		}
+			
+	}	
+}
 
 int main(int argc, char** argv) {
 	
 	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
-	 
-	ci2(N, S);
 	
-	rep(i, 0, N){
-		ci(seq[i]);
+	ci2(N, M);
+	ci(V);
+		
+	rep(i, 0, M){
+		
+		int a, b;
+		ci2(a, b);
+		adjList[a].pb(b);
+		adjList[b].pb(a);
+		
 	}
 	
-	int ans = 0;
+	rep(i, 0, N)
+		sort(adjList[i].begin(), adjList[i].end());
 	
-	// 비트마스크로 생성한 패턴에 맞추어 원소를 더함 
-	rep(pattern, 1, (1 << N)){
-		int sum = 0;
-		rep(i, 0, N){
-			if((pattern & (1 << i)) != 0){
-				sum += seq[i];	
-			}
-		}
-		if(sum == S) ans++;
-	}
-	
-	col(ans);
+	dfs(V);
+	cl;
+	bfs(V);
 	
 	return 0;
 }

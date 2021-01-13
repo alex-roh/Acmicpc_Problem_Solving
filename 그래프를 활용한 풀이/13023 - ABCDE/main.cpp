@@ -38,36 +38,67 @@ const int MAX = 2000000000;
 
 using namespace std;
 
-int N, S;
-int seq[21];
-int pattern;
+int N, M;
+vi graph[2001];
+bool visited[2001];
+int ans;
+
+bool DFS(int vertex, int cnt){
+
+	// 정답을 찾음
+	if(cnt >= 5){
+		return true;
+	} 
+		
+	// 현재 정점에 있는 모든 간선으로 뻗어나가 봄 
+	rep(i, 0, graph[vertex].size()){
+		
+		int &nextVertex = graph[vertex][i];
+		
+		if(visited[nextVertex] == false){
+		
+			int &nextVertex = graph[vertex][i];
+			visited[nextVertex] = true;
+			
+			if(DFS(nextVertex, cnt + 1) == true)
+				return true;
+			else
+				visited[nextVertex] = false;
+		}			
+	}
+	
+	return false;
+			
+}
 
 int main(int argc, char** argv) {
 	
 	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
-	 
-	ci2(N, S);
+	
+	ci2(N, M);
+	
+	while(M--){
+		
+		int a, b;
+		ci2(a, b);
+		graph[a].pb(b);
+		graph[b].pb(a);
+		
+	}
 	
 	rep(i, 0, N){
-		ci(seq[i]);
-	}
-	
-	int ans = 0;
-	
-	// 비트마스크로 생성한 패턴에 맞추어 원소를 더함 
-	rep(pattern, 1, (1 << N)){
-		int sum = 0;
-		rep(i, 0, N){
-			if((pattern & (1 << i)) != 0){
-				sum += seq[i];	
-			}
+		visited[i] = true;
+		if(DFS(i, 1)){
+			ans = 1;
+			break;
 		}
-		if(sum == S) ans++;
+		visited[i] = false;
 	}
-	
+
 	col(ans);
 	
 	return 0;
 }
+
