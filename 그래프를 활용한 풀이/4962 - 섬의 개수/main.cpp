@@ -52,10 +52,6 @@ int W, H;
 
 int BFS(int x, int y){
 	
-	if(visited[x][y] == true){
-		return 0;
-	}
-	
 	queue<pii> que;
 	que.push(mp(x, y));
 	visited[x][y] = true;
@@ -65,8 +61,6 @@ int BFS(int x, int y){
 		pii cur = que.front();
 		que.pop();
 		
-		// cos("current is ("); cos(x); cos(y); col("),");
-		
 		rep(i, 0, 8){
 			
 			int nextX = cur.fst + ddx[i];
@@ -74,7 +68,7 @@ int BFS(int x, int y){
 			
 			// 아직 방문하지 않았고 범위를 초과하지 않으며 섬이라면 삽입
 			if(	   (visited[nextX][nextY] == false) 
-				&& (nextX >= 0) && (nextY >= 0) && (nextX < W) && (nextY < H)
+				&& (nextX >= 0) && (nextY >= 0) && (nextX < H) && (nextY < W)
 				&& (M[nextX][nextY] == 1)
 			){
 				visited[nextX][nextY] = true;
@@ -89,7 +83,7 @@ int BFS(int x, int y){
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
@@ -104,9 +98,10 @@ int main(int argc, char** argv) {
 		}
 		
 		int total = 0;
+		
 		rep(i, 0, H){
 			rep(j, 0, W){
-				if(BFS(i, j) == 1)
+				if(visited[i][j] == false && M[i][j] == 1 && BFS(i, j) == 1)
 					total++;
 			}	
 		}
