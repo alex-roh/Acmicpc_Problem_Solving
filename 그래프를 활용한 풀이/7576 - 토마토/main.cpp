@@ -44,47 +44,43 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-int N, M;
-int maze[101][101];
-int cost[101][101]; // (x, y)까지 오는 데 걸린 비용 
-bool visited[101][101];
+int M, N; // M - 행, N - 열
+int total;
+int sumForRipe;
+int box[1001][1001];
+int dayCachedTable[1001][1001];
 
-int BFS(int x, int y){
+queue<pii> queForRipe;
+queue<pii> queForYet;
+
+void BFS(){
 	
-	queue<pii> que;
-	que.push(mp(x, y));
-	visited[x][y] = true;
-	cost[x][y] = 1;
-	
-	while(!que.empty()){
+	// 입력받을 때 안 익은 토마토의 위치를 큐에 넣어둔 상태
+	while(!queForRipe.empty()){
 		
-		pii pos = que.front(); que.pop();
-		int curX = pos.fst;
-		int curY = pos.scd;
+		pii ripeTomato = queForRipe.front();
+		queForRipe.pop();
 		
-		// 도착 지점에 온 경우 
-		if(curX == N && curY == M){
-			return cost[curX][curY];
-		}
+		int curX = ripeTomato.fst;
+		int curY = ripeTomato.scd;
 		
 		rep(i, 0, 4){
 			
 			int nextX = curX + dx[i];
-			int nextY = curY + dy[i];		
+			int nextY = curY + dy[i];
 			
-			if(nextX >= 1 && nextY >= 1 && nextX <= N && nextY <= M
-				&& maze[nextX][nextY] == 1 && visited[nextX][nextY] == false){
+			// 해당 위치에 토마토가 안 익은 토마토가 있는 경우에만 넣음 
+			if( nextX >= 0 && nextY >= 0 && nextX < N && nextY < M &&
+				box[nextX][nextY] == 0){
 				
-				visited[nextX][nextY] = true;
-				cost[nextX][nextY] = cost[curX][curY] + 1;
-				que.push(mp(nextX, nextY));
+				dayCachedTable[nextX][nextY] = dayCachedTable[curX][curY] + 1;
+				box[nextX][nextY] = 1;
+				sumForRipe++;
+				queForRipe.push(mp(nextX, nextY));
 				
 			}
 		}
-		
 	}
-	
-	return -1;
 	
 }
 
@@ -94,19 +90,36 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci2(N, M);
-	cig(99999);
-	
-	rep(i, 1, N + 1){
-		string str;
-		gtl(str);
+	ci2(M, N);
+	rep(i, 0, N){
 		rep(j, 0, M){
-			maze[i][j + 1] = str[j] - '0';
+			ci(box[i][j]);
+			if(box[i][j] != -1) 
+				total++;
+			if(box[i][j] == 1){
+				queForRipe.push(mp(i, j));
+				sumForRipe++;	
+			}
 		}
 	}
 	
-	col(BFS(1, 1));
+	BFS();
 	
+	if(sumForRipe == total){
+		int max = -1;
+		rep(i, 0, N){
+			rep(j, 0, M){
+				if(max < dayCachedTable[i][j]){
+					max = dayCachedTable[i][j];
+				}
+			}
+		}
+		col(max);
+	}
+	else{
+		col(-1);
+	}
 	
 	return 0;
 }
+
