@@ -46,55 +46,33 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-vi graph[100001];
-di BFS;
+int N;
 
+vi DFS;
+vi resDFS;
+vi graph[100001];
+int depth[100001];
 bool visited[100001];
 
-void testBFS(){
-
-	qi que;
-	que.push(1);
-	visited[1] = true;
-	BFS.pop_front();
+void testDFS(int v, int dpth){
 	
-	while(!que.empty()){
+	if(visited[v]){
+		return;
+	}
+	
+	visited[v] = true;
+	depth[v] = dpth;
+	
+	for(auto& nextV : graph[v]){
 		
-		int v = que.front(); que.pop(); 
-		
-		// v와 연결되어 있으면서 아직 미방문된 정점을 계산 
-		int cnt = 0;
-		vi connectedVs;
-		rep(i, 0, graph[v].size()){
-			int connectedV = graph[v][i];
-			if(visited[connectedV] == false){
-				cnt++;
-				connectedVs.pb(connectedV);
-			}
+		if(visited[nextV] == false){
+			testDFS(nextV, dpth + 1);
 		}
-		
-		// BFS 배열이 제시하는 현재 정점에 대한 연결 정점들을 집어넣음 
-		rep(i, 0, cnt){
-			int cur = BFS.front();
-			BFS.pop_front();
-			que.push(cur);
-			visited[cur] = true;
-		}
-		
-		// 올바른 BFS 배열이라면 connectedVs 안에 있는 모든 원소의 visited가 true여야 함
-		rep(i, 0, connectedVs.size()){
-			int cur = connectedVs[i];
-			if(visited[cur] == false){
-				col(0);
-				return;
-			}
-		} 
 		
 	}
 	
-	col(1);
-	
-} 
+}
+
 
 int main(int argc, char** argv) {
 	
@@ -102,7 +80,6 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	int N;
 	ci(N);
 	
 	rep(i, 0, N - 1){
@@ -115,14 +92,43 @@ int main(int argc, char** argv) {
 	rep(i, 0, N){
 		int a;
 		ci(a);
-		BFS.pb(a);	
+		DFS.pb(a);
 	}
 	
-	// 입력으로 들어온 BFS 방문 순서를 검증함 
-	if(BFS[0] == 1)
-		testBFS();
-	else 
+	if(DFS[0] != 1){
 		col(0);
+		return 0;
+	}
+	
+	testDFS(1, 0);
+	memset(visited, false, sizeof(visited));
+	
+	int before = DFS[0];
+	visited[before] = true;
+	 
+	rep(i, 1, N){
+		
+		int cur = DFS[i];
+		visited[cur] = true;
+		
+		int diff = depth[before] - depth[cur];
+		if(diff < 0) diff *= -1;
+		
+		// cur과 before이 1만큼 차이나지 않으면 before이 그 경로의 맨 끝이어야 함 
+		if(diff != 1){
+			for(auto& x : graph[before]){
+				if(!visited[x]) {
+					col(0);
+					return 0;
+				}
+			}
+		}
+		
+		before = cur;
+	}
+	
+	col(1);
 	
 	return 0;
+	
 }

@@ -46,55 +46,65 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-vi graph[100001];
-di BFS;
+int N;
+int matrix[101][101]; 
+int bridge[101][101];
+int visited[101][101];
 
-bool visited[100001];
+queue<pii> bridgeQue;
 
-void testBFS(){
+int cnt;
 
-	qi que;
-	que.push(1);
-	visited[1] = true;
-	BFS.pop_front();
+void DFS(int x, int y){
 	
-	while(!que.empty()){
+	visited[x][y] = true;
+	matrix[x][y] += cnt;
+	
+	rep(i, 0, 4){
 		
-		int v = que.front(); que.pop(); 
+		int nX = x + dx[i];
+		int nY = y + dy[i];
 		
-		// v와 연결되어 있으면서 아직 미방문된 정점을 계산 
-		int cnt = 0;
-		vi connectedVs;
-		rep(i, 0, graph[v].size()){
-			int connectedV = graph[v][i];
-			if(visited[connectedV] == false){
-				cnt++;
-				connectedVs.pb(connectedV);
+		if(bnd(nX, nY, N) && !visited[nX][nY] && matrix[nX][nY] == 1)
+			DFS(nX, nY);
+	}
+	
+}
+
+int BFS(){
+	
+	while(!bridgeQue.empty()){
+		
+		pii xy = bridgeQue.front(); bridgeQue.pop();
+		int x = xy.fst;
+		int y = xy.scd;
+		
+		rep(i, 0, 4){
+			
+			int nX = x + dx[i];
+			int nY = y + dy[i];
+			
+			if(!bnd(nX, nY, N)) continue;
+			
+			// nX, nY에 다른 섬의 다리가 놓여 있다면 종료
+			if(bridge[x][y] != 0 && bridge[nX][nY] != 0 &&
+				matrix[x][y] != matrix[nX][nY]){
+				return bridge[nX][nY] + bridge[x][y];
+			}
+			// nX, nY에 같은 섬의 다리가 놓여 있다면 skip
+			// nX, nY가 바다라면 다리를 놓음 
+			else if(matrix[nX][nY] == 0){
+				
+				matrix[nX][nY] = matrix[x][y];     // 해당 구역을 자기 섬으로 칠함 
+				bridge[nX][nY] = bridge[x][y] + 1; // 다리를 놓음 
+				bridgeQue.push(mp(nX, nY));
+			
 			}
 		}
-		
-		// BFS 배열이 제시하는 현재 정점에 대한 연결 정점들을 집어넣음 
-		rep(i, 0, cnt){
-			int cur = BFS.front();
-			BFS.pop_front();
-			que.push(cur);
-			visited[cur] = true;
-		}
-		
-		// 올바른 BFS 배열이라면 connectedVs 안에 있는 모든 원소의 visited가 true여야 함
-		rep(i, 0, connectedVs.size()){
-			int cur = connectedVs[i];
-			if(visited[cur] == false){
-				col(0);
-				return;
-			}
-		} 
 		
 	}
 	
-	col(1);
-	
-} 
+}
 
 int main(int argc, char** argv) {
 	
@@ -102,27 +112,33 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	int N;
 	ci(N);
 	
-	rep(i, 0, N - 1){
-		int a, b;
-		ci2(a, b);
-		graph[a].pb(b);
-		graph[b].pb(a);
-	} 
-	
 	rep(i, 0, N){
-		int a;
-		ci(a);
-		BFS.pb(a);	
+		rep(j, 0, N){
+			ci(matrix[i][j]);	
+		}
 	}
 	
-	// 입력으로 들어온 BFS 방문 순서를 검증함 
-	if(BFS[0] == 1)
-		testBFS();
-	else 
-		col(0);
+	// DFS로 서로 다른 섬을 마킹함 
+	rep(i, 0, N){
+		rep(j, 0, N){
+			if(!visited[i][j] && matrix[i][j] == 1){
+				DFS(i, j);
+				cnt++;
+			}
+		}
+	}
+	
+	// BFS로 각각의 섬 모든 부분에 다리를 붙여봄
+	rep(i, 0, N){
+		rep(j, 0, N){
+			if(matrix[i][j] > 0)
+				bridgeQue.push(mp(i, j));
+		}
+	} 
+	
+	col(BFS());
 	
 	return 0;
 }
