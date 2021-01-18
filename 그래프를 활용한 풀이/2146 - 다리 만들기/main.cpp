@@ -50,6 +50,7 @@ int N;
 int matrix[101][101]; 
 int bridge[101][101];
 int visited[101][101];
+bool isConnected;
 
 queue<pii> bridgeQue;
 
@@ -71,7 +72,17 @@ void DFS(int x, int y){
 	
 }
 
+bool isThereBridge(int x, int y, int nX, int nY){
+	return (bridge[nX][nY] != 0 && matrix[x][y] != matrix[nX][nY] && matrix[nX][nY] != 0);
+}
+
+bool isThereIsland(int x, int y, int nX, int nY){
+	return (bridge[nX][nY] == 0 && matrix[x][y] != matrix[nX][nY] && matrix[nX][nY] != 0);
+}
+
 int BFS(){
+	
+	int res = MAX;
 	
 	while(!bridgeQue.empty()){
 		
@@ -83,26 +94,32 @@ int BFS(){
 			
 			int nX = x + dx[i];
 			int nY = y + dy[i];
-			
 			if(!bnd(nX, nY, N)) continue;
 			
-			// nX, nY에 다른 섬의 다리가 놓여 있다면 종료
-			if(bridge[x][y] != 0 && bridge[nX][nY] != 0 &&
-				matrix[x][y] != matrix[nX][nY]){
-				return bridge[nX][nY] + bridge[x][y];
-			}
-			// nX, nY에 같은 섬의 다리가 놓여 있다면 skip
-			// nX, nY가 바다라면 다리를 놓음 
-			else if(matrix[nX][nY] == 0){
-				
+			// 다리가 연결되어 있지 않고, nX, nY가 바다라면 다리를 놓음 
+			if(!isConnected && matrix[nX][nY] == 0){
 				matrix[nX][nY] = matrix[x][y];     // 해당 구역을 자기 섬으로 칠함 
 				bridge[nX][nY] = bridge[x][y] + 1; // 다리를 놓음 
 				bridgeQue.push(mp(nX, nY));
-			
+				
+			}
+			// nX, nY에 다른 섬의 다리가 놓여 있으면 연결된 다리가 정답일 수 있음 
+			else if(isThereBridge(x, y, nX, nY)){
+				bridge[nX][nY] += bridge[x][y];
+				if(bridge[nX][nY] < res) 
+					res = bridge[nX][nY];
+				isConnected = true;
+			}
+			// nX, nY가 다른 섬이라면 현재 다리가 정답일 수 있음 
+			else if(isThereIsland(x, y, nX, nY)){
+				if(bridge[x][y] < res) 
+					res = bridge[x][y];
+				isConnected = true;
 			}
 		}
-		
 	}
+	
+	return res;
 	
 }
 
@@ -133,12 +150,14 @@ int main(int argc, char** argv) {
 	// BFS로 각각의 섬 모든 부분에 다리를 붙여봄
 	rep(i, 0, N){
 		rep(j, 0, N){
-			if(matrix[i][j] > 0)
+			if(matrix[i][j] > 0){
 				bridgeQue.push(mp(i, j));
+			}
 		}
 	} 
 	
-	col(BFS());
+	int res = BFS();
+	col(res);
 	
 	return 0;
 }
