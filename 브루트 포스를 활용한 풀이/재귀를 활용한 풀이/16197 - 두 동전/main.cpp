@@ -46,9 +46,63 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-int K;
-vi candidate(10, 0);
-char input[20];
+int N, M;
+int sfx, sfy; // starting first x, y
+int ssx, ssy; // starting second x, y
+char B[21][21];
+
+int minCnt = MAX;
+
+bool isDropped(int x, int y){
+	return (x < 0 || x >= N || y < 0 || y >= M);
+}
+
+// 두 동전을 이동시킴 
+int go(int fx, int fy, int sx, int sy, int cnt){
+	
+	if(cnt > 10) return -1;
+	
+	// 동전이 밑으로 떨어진 경우 
+	if(isDropped(fx, fy) || isDropped(sx, sy)){
+	
+		if(isDropped(fx, fy) && isDropped(sx, sy)) 
+			return -1;
+	
+		if(minCnt > cnt)
+			minCnt = cnt;
+	
+		return 0;
+
+	}
+	
+	rep(i, 0, 4){
+		
+		int nfx, nfy, nsx, nsy;
+		
+		nfx = fx + dx[i];
+		nfy = fy + dy[i];
+		
+		if(bnd2(nfx, nfy, N, M) && B[nfx][nfy] == '#'){
+			nfx = fx;
+			nfy = fy;
+		}
+		
+		nsx = sx + dx[i];
+		nsy = sy + dy[i];
+				
+		if(bnd2(nsx, nsy, N, M) && B[nsx][nsy] == '#'){
+			nsx = sx;
+			nsy = sy;
+		}
+		
+		int res = go(nfx, nfy, nsx, nsy, cnt + 1);
+		if(res == -1) continue;
+		
+	}
+	
+	return 0;
+	
+}
 
 int main(int argc, char** argv) {
 	
@@ -56,67 +110,42 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci(K);
-	string str = "";
-	string input = "";
+	ci2(N, M);
 	cig(99999);
-	gtl(str);
+	bool isFirst = true;
 	
-	rep(i, 0, str.size()){
-		if(str[i] == ' ') continue;
-		else input += str[i];
+	rep(i, 0, N){
+		string str;
+		gtl(str);
+		
+		rep(j, 0, M){
+			
+			B[i][j] = str[j];
+			
+			if(B[i][j] == 'o'){
+				
+				if(isFirst){
+					sfx = i;
+					sfy = j;
+					isFirst = false;
+				}
+				else {
+					ssx = i;
+					ssy = j;
+				}
+			}
+			
+		}
 	}
 	
-	rep(i, 0, 10)
-		candidate[i] = i;
+	go(sfx, sfy, ssx, ssy, 0);
 	
-	bool isFirst = true;
-	string minStr;
-	string maxStr;
-	
-	do {
-		
-		bool isCorrect = true;
-		string cur = "";
-		
-		rep(i, 0, K){
-			
-			if(input[i] == '<'){
-				if(candidate[i] >= candidate[i + 1]){
-					isCorrect = false;
-					break;
-				}
-			}
-			else {	
-				if(candidate[i] <= candidate[i + 1]){
-					isCorrect = false;
-					break;
-				}
-			}
-			
-			cur += (char) (candidate[i] + '0');
-			
-		}
-		
-		if(isCorrect){
-			
-			cur += (char) (candidate[K] + '0');
-			
-			if(isFirst){
-				isFirst = false;
-				minStr = cur;
-				maxStr = cur;
-			}
-			else {
-				maxStr = cur;
-			}
-			
-		}
-		
-	} while(next_permutation(candidate.begin(), candidate.end()));
-	
-	col(maxStr);
-	col(minStr);
+	if(minCnt < MAX){
+		col(minCnt);
+	}
+	else{
+		col(-1);
+	}
 	
 	return 0;
 }
