@@ -46,11 +46,50 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
+int N;
+int B[15];
+int cnt;
+
+bool check(int row){
+	
+	rep(i, 0, row){
+		if(B[i] == B[row]) return false;
+		if((row - i) == abs(B[row] - B[i])) return false;
+	}
+	
+	return true;
+
+}
+
+void go(int row){
+		
+	if(row == N){
+		cnt++;
+		return;
+	}
+	
+	else {
+		
+		rep(col, 0, N){
+			B[row] = col;
+			if(check(row))
+				go(row + 1);
+		}
+		
+	}
+	
+}
+
 int main(int argc, char** argv) {
 	
 	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
+	
+	ci(N);
+	go(0);
+	
+	col(cnt);
 	
 	return 0;
 }
