@@ -52,7 +52,6 @@ int tc = 1;
 int B[11][11];
 bool domino[11][11];
 int block[10] = {0, 1, 1, 1, 4, 4, 4, 7, 7, 7};
-bool isEnd;
 vector<pii> toBeFilled;
 
 bool checkBound(int a, int b, int N, int M){
@@ -112,7 +111,6 @@ bool go(int index){
     // 빈칸을 모두 채운 것이므로 true를 반환 
     // if(isEnd) return true;
 	if(index == toBeFilled.size()){
-    	isEnd = true;
     	printB();
 		return true;
 	}
@@ -123,7 +121,8 @@ bool go(int index){
 
     // 이미 해당 칸을 채워넣었다면 지금 위치를 건너뜀 
     if(B[x][y] != 0) {
-    	go(index + 1);
+    	if(go(index + 1))
+    		return true;
 	}
 	else {
 
@@ -180,7 +179,6 @@ void getInputAndCallGo(){
     	memset(domino, false, sizeof(domino));
     	memset(B, 0, sizeof(B));
     	toBeFilled.clear();
-    	isEnd = false;
 
         cig(99999);
         string str;
@@ -251,7 +249,7 @@ void getInputAndCallGo(){
 
 int main(int argc, char** argv) {
 
-    // freopen("input.txt", "rt", stdin);
+    freopen("input.txt", "rt", stdin);
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
