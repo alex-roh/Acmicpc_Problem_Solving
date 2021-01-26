@@ -46,37 +46,35 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-int N;
-int B[15];
-int cnt;
+int R, C; 
+char B[21][21];
+bool visited[27];
+int maxCnt = -1;
 
-bool check(int row){
+void go(int x, int y, int cnt){
 	
-	rep(i, 0, row){
-		if(B[i] == B[row]) return false;
-		if((row - i) == abs(B[row] - B[i])) return false;
-	}
+	int alphabet = B[x][y] - 'A';
+	visited[alphabet] = true;
 	
-	return true;
-
-}
-
-void go(int row){
+	rep(i, 0, 4){
 		
-	if(row == N){
-		cnt++;
-		return;
-	}
-	
-	else {
+		int nx = x + dx[i];
+		int ny = y + dy[i];
 		
-		rep(col, 0, N){
-			B[row] = col;
-			if(check(row))
-				go(row + 1);
-		}
+		if(!bnd2(nx, ny, R, C)) continue;
+		
+		int nAlphabet = B[nx][ny] - 'A';
+		
+		if(visited[nAlphabet]) continue;
+		
+		go(nx, ny, cnt + 1);
 		
 	}
+	
+	visited[alphabet] = false;
+	
+	if(maxCnt < cnt)
+		maxCnt = cnt;
 	
 }
 
@@ -86,10 +84,24 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci(N);
-	go(0);
+	ci2(R, C);
+	cig(99999);
 	
-	col(cnt);
+	rep(i, 0, R){
+		
+		string str;
+		gtl(str);
+		
+		rep(j, 0, C){
+			
+			B[i][j] = str[j];
+			
+		}
+	}
+	
+	go(0, 0, 1);
+	
+	col(maxCnt);
 	
 	return 0;
 }

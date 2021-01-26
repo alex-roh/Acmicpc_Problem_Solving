@@ -46,36 +46,74 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-int N;
-int B[15];
-int cnt;
+int S[9][9];
+int block[9] = { 0, 0, 0, 3, 3, 3, 6, 6, 6 };
+vector<pii> toBeFilled;
 
-bool check(int row){
+bool check(int x, int y){
+
+	// 속한 행과 열을 검사
+	rep(i, 0, 9){
+		if((S[x][i] == S[x][y]) && (i != y)) 
+			return false;
+		if((S[i][y] == S[x][y]) && (i != x))
+			return false;
+	}
 	
-	rep(i, 0, row){
-		if(B[i] == B[row]) return false;
-		if((row - i) == abs(B[row] - B[i])) return false;
+	// 속한 정사각형을 검사 
+	int row = block[x];
+	int col = block[y];
+	
+	vb nums(10, false);
+	
+	rep(i, row, row + 3){
+		rep(j, col, col + 3){
+			
+			int val = S[i][j];
+			
+			if(val == 0) 
+				continue;
+		
+			if(nums[val]) return false;
+			else nums[val] = true;
+		
+		}
 	}
 	
 	return true;
-
+	
 }
 
-void go(int row){
+bool go(int index){
+	
+	if(index == toBeFilled.size()) 
+		return true;
+	
+	pii pos = toBeFilled[index];
+	int x = pos.fst;
+	int y = pos.scd;
+	
+	rep(num, 1, 10){
 		
-	if(row == N){
-		cnt++;
-		return;
+		S[x][y] = num;
+		
+		if(check(x, y) && go(index + 1))
+			return true;
+		
+		S[x][y] = 0;
 	}
 	
-	else {
-		
-		rep(col, 0, N){
-			B[row] = col;
-			if(check(row))
-				go(row + 1);
+	return false;
+	
+}
+
+void printS(){
+	
+	rep(i, 0, 9){
+		rep(j, 0, 9){
+			cos(S[i][j]);
 		}
-		
+		cl;
 	}
 	
 }
@@ -86,10 +124,21 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci(N);
-	go(0);
+	rep(i, 0, 9){
+		rep(j, 0, 9){
+			ci(S[i][j]);
+			if(S[i][j] == 0)
+				toBeFilled.pb(mp(i, j));
+		}
+	}
 	
-	col(cnt);
+	if(toBeFilled.size() > 0){
+		go(0);	
+	}
+	
+	printS();
 	
 	return 0;
+
 }
+
