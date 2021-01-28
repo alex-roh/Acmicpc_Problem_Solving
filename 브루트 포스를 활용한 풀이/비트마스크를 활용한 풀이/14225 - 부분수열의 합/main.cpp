@@ -46,35 +46,9 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-typedef struct _Task {
-	int time;
-	int pay;
-} Task;
-
-// 전역변수 
-Task tasks[20];
 int N;
-int maxVal = -1;
-vi maxProfitAfter(21, -1);
-
-int go(int day){
-	
-	if(day == N + 1) return 0;
-	if(day > N + 1) return -MAX;
-	
-	// 이미 예전에 값을 구해둔 적이 있다면 캐싱된 값으로 반환
-	if(maxProfitAfter[day] != -1)
-		return maxProfitAfter[day];
-		
-	int t1 = go(day + tasks[day].time) + tasks[day].pay;
-	int t2 = go(day + 1);
-	
-	maxProfitAfter[day] = max(t1, t2);
-	
-	return maxProfitAfter[day];
-}
-
-
+int seq[21];
+bool nat[2000001];
 
 int main(int argc, char** argv) {
 	
@@ -82,12 +56,35 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	cin >> N;
-	for(int i = 1; i <= N; i++){
-		cin >> tasks[i].time >> tasks[i].pay;
+	ci(N);
+	
+	rep(i, 0, N){
+		ci(seq[i]);
 	}
-
-	cout << go(1);
+	
+	// 1. 비트마스크 패턴을 생성
+	rep(pattern, 1, (1 << N)){
+		
+		int sum = 0;
+		
+		rep(i, 0, N){
+			// 2. 해당 원소가 생성된 비트마스크 패턴에 포함되어 있으면 합에 더함 
+			if((pattern & (1 << i)) != 0){
+				sum += seq[i];
+			}
+			
+		}
+		
+		nat[sum] = true;
+		
+	}
+	
+	rep(i, 1, 2000001){
+		if(!nat[i]){
+			col(i);
+			return 0;
+		}
+	}
 	
 	return 0;
 }

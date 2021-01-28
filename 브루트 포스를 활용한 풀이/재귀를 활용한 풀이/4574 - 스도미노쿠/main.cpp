@@ -249,7 +249,7 @@ void getInputAndCallGo(){
 
 int main(int argc, char** argv) {
 
-    freopen("input.txt", "rt", stdin);
+    // freopen("input.txt", "rt", stdin);
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
