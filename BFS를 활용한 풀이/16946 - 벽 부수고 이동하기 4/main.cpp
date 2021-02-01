@@ -60,127 +60,136 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 const int MAX = 2000000000;
 
 int N, M;
-int walls[3];
-int B[9][9];
+int B[1001][1001];
+int Z[1001][1001];
+int zerosForBlock[1001];
+vector<pii> zeros;
+vector<pii> toBeFilled;
 
-int res = -1;
+int cnt;
 
-vi blanks;
-vi viruses;
-
-// 초기화 필요 
-int b[9][9];
-bool visited[9][9];
-
-int getIndex(int i, int j){
-	return (i * M + j);
-}
-
-pii getXY(int index){
-	return mp(index / M, index % M);
-}
-
-void BFS(){
+// 제로 블록을 모음 
+void BFS(int sx, int sy, int index){
 	
 	queue<pii> que;
-	
-	// 빈칸 세 개를 벽으로 칠함 
-	rep(i, 0, 3){
-		pii wall = getXY(walls[i]);
-		b[wall.fst][wall.scd] = 1;
-	}
-	
-	// 입력 배열을 복사받음 
-	rep(i, 0, N){
-		rep(j, 0, M){ 
-			if(b[i][j] != -1) continue;
-			b[i][j] = B[i][j];
-			// 바이러스는 큐에 집어넣음 
-			if(b[i][j] == 2){
-				que.ps(mp(i, j));
-				visited[i][j] = true;
-			}
-		}
-	}
+	que.ps(mp(sx, sy));
+	Z[sx][sy] = index;
 	
 	while(!que.emt()){
 		
-		pii cur = que.frt(); que.pp();
-		
-		int x = cur.fst;
-		int y = cur.scd;
+		pii zero = que.frt(); que.pp();
+		int x = zero.fst;
+		int y = zero.scd;
 		
 		rep(i, 0, 4){
 			
 			int nx = x + dx[i];
 			int ny = y + dy[i];
 			
-			if(!bnd2(nx, ny, N, M)) continue;
-			if(visited[nx][ny]) continue;
-			if(b[nx][ny] == 2 || b[nx][ny] == 1) continue;
+			if(!bnd2(nx, ny, N, M)) continue; 
+			if(B[x][y] == 1 || Z[x][y] > 0) continue;
 			
-			b[nx][ny] = 2;
+			Z[x][y] = index;
+			zerosForBlock[index]++;
 			que.ps(mp(nx, ny));
-			visited[nx][ny] = true;
 			
 		}
 		
 	}
 	
-	// 최대값 갱신
-	int cnt = 0; 
-	rep(i, 0, N){
-		rep(j, 0, M){
-			if(b[i][j] == 0)
-				cnt++;
-		}
+}
+
+// 빈 공간마다 BFS를 호출하는 함수 
+void searchByZero(){
+	
+	int index = 1;
+	queue<pii> que;
+	for(auto& x : zeros){
+		que.ps(x);
 	}
 	
-	res = max(res, cnt);
+	while(!que.emt()){
+		
+		pii zero = que.frt(); que.pp();
+		
+		int x = zero.fst;
+		int y = zero.scd;
+		
+		if(B[x][y] > 0) continue;
+		
+		BFS(x, y, index);
+		index++;
+		
+	}
 	
 }
 
-// 모든 빈칸에서 3개의 서로 다른 빈칸을 고름 
-void gen(int cnt, int level){
+// 벽마다 이동할 수 있는 제로 블록을 찾아서 캐싱 
+void count(){
 	
-	if(cnt == 3){
-		memset(visited, false, sizeof(visited[0][0]) * 9 * 9);
-		memset(b, -1, sizeof(b[0][0]) * 9 * 9);
-		BFS();
-		return;
-	}
-	
-	rep(i, level, blanks.size()){
-		walls[cnt] = blanks[i];
-		gen(cnt + 1, i + 1);
+	rep(i, 0, N){
+		rep(j, 0, M){
+		
+			if(B[i][j] == 1){
+				
+				set<int> nearZeros;
+				
+				// 상하좌우에 있는 제로 블록을 탐색 
+				rep(k, 0, 4){
+					
+					int ni = i + dx[k];
+					int nj = j + dy[k];
+					
+					if(!bnd2(ni, nj, N, M)) continue;
+					if(B[ni][nj] == 0) 
+						nearZeros.insert(Z[ni][nj]);
+					
+				}
+				
+				// 블록별로 개수를 더함 
+				for(auto &x : nearZeros){
+					B[i][j] += zerosForBlock[x];
+				}
+				
+			}
+		}
 	}
 	
 }
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
 	ci2(N, M);
+	cig(99999);
+	
+	rep(i, 0, N){
+		
+		string row;
+		gtl(row);
+		
+		rep(j, 0, M){
+				
+			B[i][j] = row[j] - '0';
+			
+			if(B[i][j] == 0)
+				zeros.pb(mp(i, j));	
+		}
+		
+	}
+	
+	searchByZero();
+	count();
 	
 	rep(i, 0, N){
 		rep(j, 0, M){
-			
-			ci(B[i][j]);
-			
-			// 빈칸을 벡터에 캐싱 
-			if(B[i][j] == 0){
-				int index = getIndex(i, j);
-				blanks.pb(index);
-			}
-			
+			co(B[i][j] % 10);
 		}
+		cl;
 	}
-	
-	gen(0, 0);
-	cos(res);
 	
 	return 0;
 }

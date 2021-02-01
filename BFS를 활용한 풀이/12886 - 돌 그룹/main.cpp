@@ -59,102 +59,84 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-int N, M;
-int walls[3];
-int B[9][9];
+int A, B, C;
+int total;
+bool visited[1501][1501]; // A-B만 저장 
 
-int res = -1;
+const int AB = 0;
+const int AC = 1;
+const int BC = 2;
 
-vi blanks;
-vi viruses;
+void insertQue(queue<pii> &que, int n1, int n2){
+	
+	int X;
+	
+	if(n1 < n2) {
+		X = n1;
+		n1 += X;
+		n2 -= X;
+	}
+	else if(n2 < n1) {
+		X = n2;
+		n1 += X;
+		n2 -= X;
+	}
+	else 
+		return;
+		
+	if(!visited[n1][n2]){
+		que.ps(mp(n1, n2));
+		visited[n1][n2] = true;
+		visited[n2][n1] = true;
+	}
 
-// 초기화 필요 
-int b[9][9];
-bool visited[9][9];
-
-int getIndex(int i, int j){
-	return (i * M + j);
 }
 
-pii getXY(int index){
-	return mp(index / M, index % M);
-}
-
-void BFS(){
+int BFS(){
 	
 	queue<pii> que;
-	
-	// 빈칸 세 개를 벽으로 칠함 
-	rep(i, 0, 3){
-		pii wall = getXY(walls[i]);
-		b[wall.fst][wall.scd] = 1;
-	}
-	
-	// 입력 배열을 복사받음 
-	rep(i, 0, N){
-		rep(j, 0, M){ 
-			if(b[i][j] != -1) continue;
-			b[i][j] = B[i][j];
-			// 바이러스는 큐에 집어넣음 
-			if(b[i][j] == 2){
-				que.ps(mp(i, j));
-				visited[i][j] = true;
-			}
-		}
-	}
+	que.ps(mp(A, B));
+	visited[A][B] = true;
 	
 	while(!que.emt()){
 		
 		pii cur = que.frt(); que.pp();
 		
-		int x = cur.fst;
-		int y = cur.scd;
+		int a = cur.fst;
+		int b = cur.scd;
+		int c = total - a - b;
 		
-		rep(i, 0, 4){
-			
-			int nx = x + dx[i];
-			int ny = y + dy[i];
-			
-			if(!bnd2(nx, ny, N, M)) continue;
-			if(visited[nx][ny]) continue;
-			if(b[nx][ny] == 2 || b[nx][ny] == 1) continue;
-			
-			b[nx][ny] = 2;
-			que.ps(mp(nx, ny));
-			visited[nx][ny] = true;
-			
+		if(a == b && b == c) return 1;
+		
+		int nums[3] = { a, b, c }; 
+	
+		rep(i, 0, 3){
+			rep(j, 0, 3){
+				
+				if(i == j) continue;
+				
+				if(nums[i] < nums[j]){
+				
+					int X = nums[i];
+					int copied[3] = { a, b, c };	
+					
+					copied[i] += X;
+					copied[j] -= X;
+					
+					if(!visited[copied[i]][copied[j]]){
+						que.ps(mp(copied[i], copied[j]));
+						visited[copied[i]][copied[j]] = true;
+					}
+					
+				}
+				
+				
+			}
 		}
 		
 	}
-	
-	// 최대값 갱신
-	int cnt = 0; 
-	rep(i, 0, N){
-		rep(j, 0, M){
-			if(b[i][j] == 0)
-				cnt++;
-		}
-	}
-	
-	res = max(res, cnt);
-	
-}
 
-// 모든 빈칸에서 3개의 서로 다른 빈칸을 고름 
-void gen(int cnt, int level){
-	
-	if(cnt == 3){
-		memset(visited, false, sizeof(visited[0][0]) * 9 * 9);
-		memset(b, -1, sizeof(b[0][0]) * 9 * 9);
-		BFS();
-		return;
-	}
-	
-	rep(i, level, blanks.size()){
-		walls[cnt] = blanks[i];
-		gen(cnt + 1, i + 1);
-	}
-	
+	return 0;	
 }
 
 int main(int argc, char** argv) {
@@ -163,24 +145,11 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci2(N, M);
+	ci2(A, B); ci(C);
+	total = A + B + C;
 	
-	rep(i, 0, N){
-		rep(j, 0, M){
-			
-			ci(B[i][j]);
-			
-			// 빈칸을 벡터에 캐싱 
-			if(B[i][j] == 0){
-				int index = getIndex(i, j);
-				blanks.pb(index);
-			}
-			
-		}
-	}
-	
-	gen(0, 0);
-	cos(res);
+	if(A == B && B == C) cos(1);
+	else cos(BFS());
 	
 	return 0;
 }
