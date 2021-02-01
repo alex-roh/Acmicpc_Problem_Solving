@@ -2,11 +2,14 @@
 
 using namespace std;
 
-#define bnd(a,b,c) (a >= 0 && b >= 0 && a < c && b < c)
-#define bnd2(a, b, c, d) (a >= 0 && b >= 0 && a < c && b < d)
 
+#define bnd(a,b,c,d) (a >= 0 && b >= 0 && a < c && b < d)
+#define prt(arr, N, M) cl; rep(i, 0, N){ rep(j, 0, M){ cos(arr[i][j]); } cl; } cl;
+
+#define irep(i,a,b) for(vector<int>::iterator i = a; i != b; i++)
+#define pirep(i,a,b) for(vector<pii>::iterator i = a; i != b; i++)
 #define rep(i,a,b) for(int i = a; i < b; i++)
-#define rrep(i,a,b) for(int i = b - 1; i >= a; i--)
+#define rrep(i,a,b) for(int i = a - 1; i >= b; i--)
 #define mp(a,b) make_pair(a, b)
 
 #define cig(a) cin.ignore(a, '\n')
@@ -25,128 +28,55 @@ using namespace std;
 #define fcol(a) out << a << '\n' 
 #define fcl out << '\n'
 
-#define frt front
-#define ps push
-#define pp pop
-#define emt empty
-#define pb push_back
-#define fst first
-#define scd second
-
-typedef long long ll;
-typedef vector<int> vi;
-typedef vector<bool> vb;
-typedef stack<int> si;
-typedef queue<int> qi;
-typedef deque<int> di;
-typedef priority_queue<int> pqi;
-typedef pair<int, int> pii;
-typedef tuple<int, int, int> ti3;
-typedef tuple<int, int, int, int> ti4;
-
-typedef pair<ll, ll> pll;
-typedef vector<ll> vl;
-typedef tuple<ll, ll, ll> tl3;
-typedef tuple<ll, ll, ll, ll> tl4;
-typedef stack<ll> sl;
-typedef queue<ll> ql;
-typedef priority_queue<ll> pql;
-
-int dx[4] = { 0, 1, 0, -1 };
-int dy[4] = { 1, 0, -1, 0 };
-int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
-int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
-
-const int MAX = 2000000000;
-
 ofstream out;
-int N, M; 
-int B[120];   
-int dist[120];  
-bool visited[120];
+bool check[8][8][9];
+int dx[] = {0,0,1,-1,1,-1,1,-1,0};
+int dy[] = {1,-1,0,0,1,1,-1,-1,0};
 
-void BFS(){
-	
-	qi que;
-	que.ps(1); // 1에서 시작
-	dist[1] = 0;
-	
-	while(!que.emt()){
-		
-		// 현재 위치로 이동 
-		int pos = que.frt(); que.pp();
-		
-		fco("current pos#"); fcos(pos); fcos(":");
-        
-        if(pos == 100) {
-        	fcol("BFS ended.");
-        	return;
-		}
-		
-		// 사다리나 뱀이 있는 경우 
-		if(B[pos] != pos){
-			
-			int npos = B[pos];
-			
-			if(dist[npos] == -1){
-				que.ps(npos);
-				fco("("); fcos(npos); fcos(","); fco(dist[pos]); fco(")");
-				dist[npos] = dist[pos];
-			}
-			
-			fcl;
-			continue;
-			
-		}
-		
-		// 사다리나 뱀이 아니라면 주사위를 굴려서 이동
-		rep(spot, 1,  6 + 1){
-			
-			int npos = pos + spot;
-			
-			if(npos <= 100 && (dist[npos] == -1)){
-				que.ps(npos);
-				fco("("); fcos(npos); fcos(","); fco(dist[pos] + 1); fco(")");
-				dist[npos] = dist[pos] + 1;
-			}
-			
-		}
-		
-		fcl;
-		
-	}
-	
-}
 
-int main(int argc, char** argv) {
+int main() {
 	
 	freopen("input.txt", "rt", stdin);
-	ios_base::sync_with_stdio(false);
-	cin.tie(NULL);
+	out.open("output.txt");
 	
-	ci2(N, M);
-	
-	// 보드 
-	rep(i, 1, 100 + 1){
-		B[i] = i;
-		dist[i] = -1;
+    int n = 8;
+    vector<string> a(n);
+    for (int i=0; i<n; i++) {
+        cin >> a[i];
+    }
+    queue<tuple<int,int,int>> q;
+    check[7][0][0] = true;
+    q.push(make_tuple(7,0,0));
+    bool ans = false;
+    while (!q.empty()) {
+        int x, y, t;
+        tie(x,y,t) = q.front(); q.pop();
+        if (x == 0 && y == 7) ans = true;
+        for (int k=0; k<9; k++) {
+            int nx = x+dx[k];
+            int ny = y+dy[k];
+            int nt = min(t+1, 8);
+            if (0 <= nx && nx < n && 0 <= ny && ny < n) {
+                if (nx-t >= 0 && a[nx-t][ny] == '#') continue;
+                if (nx-t-1 >= 0 && a[nx-t-1][ny] == '#') continue;
+                if (check[nx][ny][nt] == false) {
+                    check[nx][ny][nt] = true;
+                    q.push(make_tuple(nx,ny,nt));
+                }
+            }
+        }
+    }
+    
+    cout << (ans ? 1 : 0) << '\n';
+    
+	rep(i, 0, 8){
+		rep(j, 0, 8){
+			rep(k, 0, 9){
+				fco("visited["); fco(i); fco("]["); fco(j); fco("]["); fco(k); fcos("] ="); fcol(check[i][j][k]);
+			}
+		}
 	}
-	
-	int from, to;
-	
-	// 사다리 
-	rep(i, 0, N + M){
-		ci2(from, to);
-		B[from] = to;
-	}
-	
-	out.open("output_WR.txt");
-	
-	BFS();
-	
-	fcol(dist[100]);
-	
-	out.close();
-	
-	return 0;
+    
+    return 0;
 }
+
