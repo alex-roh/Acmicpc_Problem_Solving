@@ -4,6 +4,7 @@ using namespace std;
 
 #define bnd(a,b,c) (a >= 0 && b >= 0 && a < c && b < c)
 #define bnd2(a, b, c, d) (a >= 0 && b >= 0 && a < c && b < d)
+#define prt(arr) cl; rep(i, 0, N){ rep(j, 0, M){ cos(arr[i][j]); } cl; } cl;
 
 #define rep(i,a,b) for(int i = a; i < b; i++)
 #define rrep(i,a,b) for(int i = b - 1; i >= a; i--)
@@ -62,18 +63,17 @@ const int MAX = 2000000000;
 int N, M;
 int B[1001][1001];
 int Z[1001][1001];
-int zerosForBlock[1001];
-vector<pii> zeros;
-vector<pii> toBeFilled;
-
-int cnt;
+vi zerosForBlock(1); // 인덱스 1부터 시작해야 
+int idx = 1;
 
 // 제로 블록을 모음 
-void BFS(int sx, int sy, int index){
+void BFS(int sx, int sy){
 	
 	queue<pii> que;
 	que.ps(mp(sx, sy));
-	Z[sx][sy] = index;
+	zerosForBlock.pb(0);
+	Z[sx][sy] = idx;
+	zerosForBlock[idx]++;
 	
 	while(!que.emt()){
 		
@@ -87,46 +87,23 @@ void BFS(int sx, int sy, int index){
 			int ny = y + dy[i];
 			
 			if(!bnd2(nx, ny, N, M)) continue; 
-			if(B[x][y] == 1 || Z[x][y] > 0) continue;
+			if(B[nx][ny] == 1 || Z[nx][ny] > 0) continue;
 			
-			Z[x][y] = index;
-			zerosForBlock[index]++;
+			Z[nx][ny] = idx;
+			zerosForBlock[idx]++;
 			que.ps(mp(nx, ny));
 			
 		}
 		
 	}
 	
-}
-
-// 빈 공간마다 BFS를 호출하는 함수 
-void searchByZero(){
-	
-	int index = 1;
-	queue<pii> que;
-	for(auto& x : zeros){
-		que.ps(x);
-	}
-	
-	while(!que.emt()){
-		
-		pii zero = que.frt(); que.pp();
-		
-		int x = zero.fst;
-		int y = zero.scd;
-		
-		if(B[x][y] > 0) continue;
-		
-		BFS(x, y, index);
-		index++;
-		
-	}
+	idx++;
 	
 }
 
 // 벽마다 이동할 수 있는 제로 블록을 찾아서 캐싱 
 void count(){
-	
+
 	rep(i, 0, N){
 		rep(j, 0, M){
 		
@@ -166,6 +143,7 @@ int main(int argc, char** argv) {
 	ci2(N, M);
 	cig(99999);
 	
+	// 입력 
 	rep(i, 0, N){
 		
 		string row;
@@ -174,16 +152,20 @@ int main(int argc, char** argv) {
 		rep(j, 0, M){
 				
 			B[i][j] = row[j] - '0';
-			
-			if(B[i][j] == 0)
-				zeros.pb(mp(i, j));	
 		}
-		
 	}
 	
-	searchByZero();
+	// BFS 호출 
+	rep(i, 0, N){
+		rep(j, 0, M){
+			if(B[i][j] == 0 && Z[i][j] == 0)
+				BFS(i, j);
+		}
+	}
+	
 	count();
 	
+	// 결과를 출력 
 	rep(i, 0, N){
 		rep(j, 0, M){
 			co(B[i][j] % 10);
