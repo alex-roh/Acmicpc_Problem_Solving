@@ -58,119 +58,108 @@ int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
-
-int N, M;
+int N, M, K;
 int B[1001][1001];
-int Z[1001][1001];
-vi zerosForBlock(1); // 인덱스 1부터 시작해야 
-int idx = 1;
+int dist[1001][1001][12];
+int res = -1;
 
-// 제로 블록을 모음 
-void BFS(int sx, int sy){
+typedef struct _Node{
 	
-	queue<pii> que;
-	que.ps(mp(sx, sy));
-	zerosForBlock.pb(0);
-	Z[sx][sy] = idx;
-	zerosForBlock[idx]++;
+	int x; int y; int used;
+	_Node(int px, int py, int pused): x(px), y(py), used(pused) {};
+	
+} Node;
+
+bool bcheck(int nx, int ny){
+	return ((nx >= 1) && (ny >= 1) && (nx <= N) && (ny <= M));
+}
+
+int BFS(){
+	
+	queue<Node> que;
+	que.ps(Node(1, 1, 0));
+	
+	rep(i, 0, 10){
+		dist[1][1][i] = 1;
+	}
 	
 	while(!que.emt()){
 		
-		pii zero = que.frt(); que.pp();
-		int x = zero.fst;
-		int y = zero.scd;
+		Node cur = que.frt(); que.pp();
+		
+		int x = cur.x;
+		int y = cur.y;
+		int used = cur.used;
+		
+		// 도착했으면 캐싱 
+		if(x == N && y == M){
+			if(res == -1) res = dist[x][y][used];
+			else res = min(res, dist[x][y][used]);
+			continue;
+		}
 		
 		rep(i, 0, 4){
 			
 			int nx = x + dx[i];
 			int ny = y + dy[i];
 			
-			if(!bnd(nx, ny, N, M)) continue; 
-			if(B[nx][ny] == 1 || Z[nx][ny] > 0) continue;
+			if(!bcheck(nx, ny)) continue;
 			
-			Z[nx][ny] = idx;
-			zerosForBlock[idx]++;
-			que.ps(mp(nx, ny));
+			// 벽이고 폭파시킬 수 있는 경우 
+			if(B[nx][ny] == 1 && used < K){
+				
+				// 이전에 폭파시킨 적이 없다면 폭파 
+				if(dist[nx][ny][used + 1] == 0){
+					que.ps(Node(nx, ny, used + 1));
+					dist[nx][ny][used + 1] = dist[x][y][used] + 1;				
+				}
+
+			} 
+			// 빈 공간인 경우
+			else if(B[nx][ny] == 0) {
+				
+				// 이전에 다녀간 적이 없다면 다녀감
+				if(dist[nx][ny][used] == 0){
+					que.ps(Node(nx, ny, used));
+					dist[nx][ny][used] = dist[x][y][used] + 1;	
+				} 
+				
+			} 
 			
 		}
 		
 	}
 	
-	idx++;
+	return res;
 	
 }
 
-// 벽마다 이동할 수 있는 제로 블록을 찾아서 캐싱 
-void count(){
-
-	rep(i, 0, N){
-		rep(j, 0, M){
-		
-			if(B[i][j] == 1){
-				
-				set<int> nearZeros;
-				
-				// 상하좌우에 있는 제로 블록을 탐색 
-				rep(k, 0, 4){
-					
-					int ni = i + dx[k];
-					int nj = j + dy[k];
-					
-					if(!bnd(ni, nj, N, M)) continue;
-					if(B[ni][nj] == 0) 
-						nearZeros.insert(Z[ni][nj]);
-					
-				}
-				
-				// 블록별로 개수를 더함 
-				for(auto &x : nearZeros){
-					B[i][j] += zerosForBlock[x];
-				}
-				
-			}
-		}
-	}
-	
-}
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci2(N, M);
+	ci2(N, M); ci(K);
 	cig(99999);
 	
-	// 입력 
-	rep(i, 0, N){
-		
+	if(N == M && N == 1){
+		cos(1);
+		return 0;
+	}
+	
+	rep(i, 1, N + 1){
 		string row;
 		gtl(row);
+		rep(j, 1, M + 1){
+			B[i][j] = row[j - 1] - '0';
+		}
 		
-		rep(j, 0, M){
-				
-			B[i][j] = row[j] - '0';
-		}
 	}
 	
-	// BFS 호출 
-	rep(i, 0, N){
-		rep(j, 0, M){
-			if(B[i][j] == 0 && Z[i][j] == 0)
-				BFS(i, j);
-		}
-	}
-	
-	count();
-	
-	// 결과를 출력 
-	rep(i, 0, N){
-		rep(j, 0, M){
-			co(B[i][j] % 10);
-		}
-		cl;
-	}
+	cos(BFS());
 	
 	return 0;
 }
+
