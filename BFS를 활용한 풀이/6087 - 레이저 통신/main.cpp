@@ -54,129 +54,119 @@ typedef stack<ll> sl;
 typedef queue<ll> ql;
 typedef priority_queue<ll> pql;
 
-int dx[4] = { -1, 1, 0, 0 };
-int dy[4] = { 0, 0, -1, 1 };
+int dx[4] = { -1, 0, 1, 0 };
+int dy[4] = { 0, 1, 0, -1 };
 int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-int N; // 공간의 크기
-int M; // 물고기의 마리수
-int B[21][21];
-int dist[21][21];
-int sx, sy; // 아기 상어의 시작 위치
-int bsize = 2; // 아기 상어의 크기 
-int eatenFish = 0;
+int W, H;
+char B[101][101];
+int mirrors[101][101];
+bool isFind;
 
-bool isPossibleToEat(int x, int y){
-	return (B[x][y] > 0 && B[x][y] < bsize);
-}
+int sx, sy; // 시작 
+int gx, gy; // 도착 
 
-bool isPriorTo(int x, int y, int cx, int cy){
-	return (x < cx || (x == cx && y < cy));
-}
+typedef struct _Node{
+	
+	int x, y, from, cnt;
+	
+} Node;
 
-pii moveByBFS(int cx, int cy){
+int BFS(){
+
+	memset(mirrors, -1, sizeof(mirrors[0][0]) * 101 * 101);
 	
-	memset(dist, -1, sizeof(dist[0][0]) * 21 * 21);
+	queue<Node> que;
+	que.ps({ sx, sy, -1, 0 });	
+	mirrors[sx][sy] = 0;
 	
-	queue<pii> que;
-	que.ps(mp(cx, cy));
-	dist[cx][cy] = 0;
-	
-	pii resPair = mp(-1, -1);
-	int resDist = MAX;
-		
 	while(!que.emt()){
 		
-		pii cur = que.frt(); que.pp();
+		Node cur = que.frt(); que.pp();
 		
-		int x = cur.fst;
-		int y = cur.scd;
+		const int lx = 8;
+		const int ly = 6;
 		
-		// 먹을 수 있는 물고기를 발견	 
-		if(isPossibleToEat(x, y) && dist[x][y] <= resDist){
-			
-			if(resPair == mp(-1, -1) || isPriorTo(x, y, resPair.fst, resPair.scd)){
-				resDist = dist[x][y];
-				resPair = mp(x, y);	
-			}
-			
-			continue;
-		}
+		int x = cur.x;
+		int y = cur.y;
+		int from = cur.from;
+		int cnt = cur.cnt; 
 		
-		// 위 - 아래 - 왼쪽 - 오른쪽 순으로 탐색 
+		// 큐에 넣은 이후 보드의 상황이 바뀌었다면 노드를 버림
+		if(cnt != mirrors[x][y]) continue;
+		
+		// 도착했는지 확인
+		if(x == gx && y == gy) continue;
+		
 		rep(i, 0, 4){
-		
+			
 			int nx = x + dx[i];
 			int ny = y + dy[i];
 			
-			if(!bnd(nx, ny, N, N)) continue;
-			if(B[nx][ny] > bsize) continue;		
-		
-			if(dist[nx][ny] == -1){
+			if(!bnd(nx, ny, H, W)) continue;
+			if(B[nx][ny] == '*') continue;
+			
+			int diff = abs(from - i);
+			if(diff == 3) diff = 1;
+			
+			// 거울을 쓰지 않고 갈 수 있는 경우
+			if(from == -1 || diff == 0){
 				
-				dist[nx][ny] = dist[x][y] + 1;
-				que.ps(mp(nx, ny));
+				if(mirrors[nx][ny] == -1 || mirrors[nx][ny] >= mirrors[x][y]){
+					
+					mirrors[nx][ny] = mirrors[x][y];
+					que.ps({ nx, ny, i, mirrors[nx][ny]});
 
+				}
+				
+			} 
+			// 겨울을 쓰고 갈 수 있는 경우 
+			else if(diff == 1){
+			
+				if(mirrors[nx][ny] == -1 || (mirrors[nx][ny] >= mirrors[x][y] + 1)){
+	
+					mirrors[nx][ny] = mirrors[x][y] + 1;
+					que.ps({ nx, ny, i, mirrors[nx][ny]});
+					
+				}
+				
 			}
 			
-		} 
+		}
 		
 	}
 	
-	return resPair;
+	return mirrors[gx][gy];
 	
 }
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	// reopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
 	
-	ci(N);
-	rep(i, 0, N){
-		rep(j, 0, N){
-			
-			ci(B[i][j]);
-			
-			if(B[i][j] == 9){
+	ci2(W, H); cig(99999);
+	
+	rep(i, 0, H){
+		string row;
+		gtl(row);
+		rep(j, 0, W){
+			B[i][j] = row[j];
+			if(B[i][j] == 'C' && !isFind){
 				sx = i; sy = j;
-				B[i][j] = 0;
+				isFind = true;
 			}
-			else if(B[i][j] > 0){
-				M++;
+			else if(B[i][j] == 'C' && isFind){
+				gx = i; gy = j;
 			}
-			
 		}
-		
 	}
 	
-	int res = 0;
-	while(true){
-		
-		pii newPos = moveByBFS(sx, sy);
-		
-		sx = newPos.fst;
-		sy = newPos.scd;
-		
-		if(sx == -1 && sy == -1)
-			break;
-			
-		eatenFish++;
-		B[sx][sy] = 0;
-		res += dist[sx][sy];
-		
-		// 먹은 물고기 수가 사이즈가 같은 경우 
-		if(eatenFish == bsize) {
-			bsize++;
-			eatenFish = 0; // 초기화 -> 빼먹어서 틀림 
-		}
-		
-	}
-	
-	col(res);
+	co(BFS());
 	
 	return 0;
 }
