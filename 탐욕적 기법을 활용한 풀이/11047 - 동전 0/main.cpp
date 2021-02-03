@@ -58,70 +58,8 @@ int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
-const int LIMIT = 1000000000LL;
-
-ll S, T;
-
-typedef pair<ll, string> plls;
-
-bool checkBnd(ll ns){
-	return ns <= LIMIT;
-}
-
-string BFS(){
-	
-	queue<plls> que;
-	que.ps(mp(S, ""));
-	
-	// 제한이 너무 크기 때문에 배열 대신 set을 사용 
-	set<ll> st;
-	st.insert(S);
-	
-	while(!que.emt()){
-		
-		plls cur = que.frt(); que.pp();
-		
-		ll s = cur.fst;
-		string path = cur.scd;
-		
-		if(s == T) return path;
-		
-		ll ns;
-		
-		// *
-		ns = s * s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "*"));
-			st.insert(ns);
-		}
-		
-		// +
-		ns = s + s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "+"));
-			st.insert(ns);
-		}
-		
-		// -
-		ns = s - s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "-"));
-			st.insert(ns);
-		}
-		
-		// /
-		if(s == 0) continue;
-		ns = s / s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "/"));
-			st.insert(ns);
-		}
-		
-	}
-	
-	return "-1";
-	
-}
+int N, K;
+int cK;
 
 int main(int argc, char** argv) {
 	
@@ -129,13 +67,27 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci2(S, T);
-	
-	if(S == T){
-		co(0); return 0;
+	ci2(N, K);
+	cK = K;
+	vi coins;
+	rep(i, 0, N){
+		int num; ci(num);
+		coins.pb(num);
 	}
-	else
-		co(BFS());
+	
+	sort(coins.begin(), coins.end(), greater<int>());
+	
+	int cnt = 0;
+	for(auto amt : coins){
+		
+		while(amt <= cK && cK > 0){
+			cK = cK - amt;
+			cnt++;
+		}
+		
+	}
+	
+	cos(cnt);
 	
 	return 0;
 }

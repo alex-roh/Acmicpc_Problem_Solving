@@ -58,84 +58,45 @@ int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
-const int LIMIT = 1000000000LL;
 
-ll S, T;
-
-typedef pair<ll, string> plls;
-
-bool checkBnd(ll ns){
-	return ns <= LIMIT;
-}
-
-string BFS(){
-	
-	queue<plls> que;
-	que.ps(mp(S, ""));
-	
-	// 제한이 너무 크기 때문에 배열 대신 set을 사용 
-	set<ll> st;
-	st.insert(S);
-	
-	while(!que.emt()){
-		
-		plls cur = que.frt(); que.pp();
-		
-		ll s = cur.fst;
-		string path = cur.scd;
-		
-		if(s == T) return path;
-		
-		ll ns;
-		
-		// *
-		ns = s * s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "*"));
-			st.insert(ns);
-		}
-		
-		// +
-		ns = s + s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "+"));
-			st.insert(ns);
-		}
-		
-		// -
-		ns = s - s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "-"));
-			st.insert(ns);
-		}
-		
-		// /
-		if(s == 0) continue;
-		ns = s / s;
-		if(checkBnd(ns) && st.count(ns) == false){
-			que.ps(mp(ns, path + "/"));
-			st.insert(ns);
-		}
-		
-	}
-	
-	return "-1";
-	
-}
+bool endTimeFirst(const pii &f, const pii &s) { 
+	if(f.scd == s.scd)
+		return (f.fst < s.fst);
+	else
+		return (f.scd < s.scd); 
+} 
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	ci2(S, T);
+	int N; ci(N);
+	vector<pii> mtings(N);
 	
-	if(S == T){
-		co(0); return 0;
+	rep(i, 0, N){
+		int stt; int end;
+		ci2(stt, end);
+		mtings[i] = mp(stt, end);
 	}
-	else
-		co(BFS());
+	
+	// 끝나는 시간을 기준으로 정렬 
+	sort(mtings.begin(), mtings.end(), endTimeFirst);
+	
+	int cnt = 0; int end = -1;
+	rep(i, 0, N){
+		
+		// 회의의 시작 시간이 끝나는 시간 이후에 있으면 
+		if(mtings[i].fst >= end){
+			
+			end = mtings[i].scd;
+			cnt++;
+		}
+		
+	}
+	
+	cos(cnt);
 	
 	return 0;
 }
