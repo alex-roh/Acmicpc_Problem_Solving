@@ -3,12 +3,12 @@
 using namespace std;
 
 #define bnd(a,b,c,d) (a >= 0 && b >= 0 && a < c && b < d)
-#define prt(arr, N, M) cl; rep(i, 0, N){ rep(j, 0, M){ cos(arr[i][j]); } cl; } cl;
+#define prt(arr,N,M) cl; rep(i, 0, N){ rep(j, 0, M){ cos(arr[i][j]); } cl; } cl;
 
 #define irep(i,a,b) for(vector<int>::iterator i = a; i != b; i++)
 #define pirep(i,a,b) for(vector<pii>::iterator i = a; i != b; i++)
 #define rep(i,a,b) for(int i = a; i < b; i++)
-#define rrep(i,a,b) for(int i = a - 1; i >= b; i--)
+#define rrep(i,b,a) for(int i = b - 1; i >= a; i--)
 #define mp(a,b) make_pair(a, b)
 
 #define cig(a) cin.ignore(a, '\n')
@@ -56,95 +56,96 @@ typedef priority_queue<ll> pql;
 
 int dx[4] = { 0, 1, 0, -1 };
 int dy[4] = { 1, 0, -1, 0 };
+int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
+int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-int N = 8;
-int ux = 7, uy = 0; // 시작지점 
-int gx = 0, gy = 7; // 목표지점 
+int N;
 
-int W[8][8];
-// bool visited[8][8][9];
-int T[8][8];
-char B[8][8];
-queue<pii> walls;
+char B[101][101];
+char cB[101][101];
+int tB[101][101];
+int cnt;
 
-int ddx[9] = { 0, -1, -1, -1, 0, 1, 1, 1, 0 };
-int ddy[9] = { 0, -1, 0, 1, 1, 1, 0, -1, -1 };
+void BFS(int i, int j, char pB[][101]){
+	
+	++cnt;
+	
+	queue<pii> que;
+	que.ps(mp(i, j));
+	tB[i][j] = cnt;
 
-typedef struct _Node {
-	
-	int x; int y; int t;
-	
-} Node;
-
-int BFS(){
-	
-	queue<Node> que;
-	que.ps({ ux, uy, 0 }); // 0초의 위치 
-	
 	while(!que.emt()){
 		
-		Node cur = que.frt(); que.pp();
-		int x = cur.x;
-		int y = cur.y;
-		int t = cur.t;
+		pii cur = que.frt(); que.pp();
 		
-		// 목적지 도착 검사 
-		if(x == gx && y == gy) return 1;
+		int x = cur.fst;
+		int y = cur.scd;
 		
-		// 가만히 있는 것을 포함해 9가지 방향으로 이동 
-		rep(i, 0, 9){
+		rep(i, 0, 4){
 			
-			int nx = x + ddx[i];
-			int ny = y + ddy[i];
-			int nt = min(t + 1, 8); // 8초부터는 의미가 없음 
+			int nx = x + dx[i];
+			int ny = y + dy[i];
 			
 			if(!bnd(nx, ny, N, N)) continue;
+			if(tB[nx][ny] != 0) continue;
+			if(pB[nx][ny] != pB[x][y]) continue;
 			
-			// 목적지에 벽이 있으면 skip
-			if(nx - t >= 0 && B[nx - t][ny] == '#') continue; 
-			// 이동하고 나서 벽이 내려오면 skip
-			if(nx - t - 1 >= 0 && B[nx - t - 1][ny] == '#') continue; 
-		
-			if(!visited[nx][ny][nt]){
-				que.ps({ nx, ny, nt });
-				visited[nx][ny][nt] = true;
-			}
+			tB[nx][ny] = cnt;
+			que.ps(mp(nx, ny));
 			
 		}
 		
 	}
 	
-	return 0;
-	
+}
+
+void initGlobal(){
+	cnt = 0;
+	memset(tB, 0, sizeof(tB[0][0]) * 101 * 101);
 }
 
 int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
-	memset(W, -1, sizeof(W[0][0]) * 8 * 8);
+	
+	ci(N); cig(99999);
 	
 	rep(i, 0, N){
-		
 		string row;
 		gtl(row);
-		
 		rep(j, 0, N){
-			
-			B[i][j] = row[j];
-			
-			if(B[i][j] == '#'){
-				walls.ps(mp(i, j));
-				W[i][j] = 0;
-			}
+			B[i][j] = cB[i][j] = row[j];
+			if(row[j] == 'G')
+				cB[i][j] = 'R';
 		}
-		
 	}
 	
-	cos(BFS());
+	// 정상 
+	initGlobal();
+	rep(i, 0, N){
+		rep(j, 0, N){
+			if(tB[i][j] == 0) BFS(i, j, B);
+		}
+	}
 	
+	int res1 = cnt;
+	
+	// 적록색약 
+	initGlobal();
+	rep(i, 0, N){
+		rep(j, 0, N){
+			if(tB[i][j] == 0) BFS(i, j, cB);
+		}
+	}
+	
+	int res2 = cnt;
+	
+	cos(res1); cos(res2);
 	return 0;
+	
 }
+

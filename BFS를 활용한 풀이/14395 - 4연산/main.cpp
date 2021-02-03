@@ -5,8 +5,6 @@ using namespace std;
 #define bnd(a,b,c,d) (a >= 0 && b >= 0 && a < c && b < d)
 #define prt(arr,N,M) cl; rep(i, 0, N){ rep(j, 0, M){ cos(arr[i][j]); } cl; } cl;
 
-#define irep(i,a,b) for(vector<int>::iterator i = a; i != b; i++)
-#define pirep(i,a,b) for(vector<pii>::iterator i = a; i != b; i++)
 #define rep(i,a,b) for(int i = a; i < b; i++)
 #define rrep(i,b,a) for(int i = b - 1; i >= a; i--)
 #define mp(a,b) make_pair(a, b)
@@ -60,90 +58,74 @@ int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
+const int LIMIT = 1000000000LL;
 
-vb isPrime(10000, true);
-bool visited[10000];
+ll S, T;
 
-void gen(){
-	
-	isPrime[0] = false;
-	isPrime[1] = false;
-	
-	for(int i = 2; i < 10000; i++){
-		if(!isPrime[i]) continue;
-		for(int j = i * 2; j < 10000; j += i)
-			isPrime[j] = false;
-	}
-		
+typedef pair<ll, string> plls;
+
+bool checkBnd(ll ns){
+	return (ns <= LIMIT && ns >= 0);
 }
 
-int BFS(int src, int dest){
+string BFS(){
 	
-	memset(visited, false, sizeof(visited[0]) * 10000);
-	queue<pii> que;
-	que.ps(mp(src, 0));
-	visited[src] = true;
+	queue<plls> que;
+	que.ps(mp(S, ""));
+	
+	// 제한이 너무 크기 때문에 배열 대신 set을 사용 
+	set<ll> st;
+	st.insert(S);
 	
 	while(!que.emt()){
 		
-		pii cur = que.frt(); que.pp();
-		int num = cur.fst;
-		int cnt = cur.scd;
+		plls cur = que.frt(); que.pp();
 		
-		if(num == dest)
-			return cnt; 
+		ll s = cur.fst;
+		string path = cur.scd;
 		
-		for(int base = 1; base < 10000; base *= 10){
-			
-			int digit = (num / base) % 10;
-			int cnum = num - (digit * base);
-			
-			rep(i, 0, 10){
-				
-				int tnum = cnum + (i * base);
-				
-				// 범위 체크
-				if(tnum < 1000 || tnum > 10000) continue;
-				
-				// 아직 방문하지 않았고 소수라면 
-				if(!visited[tnum] && isPrime[tnum]){
-					visited[tnum] = true;
-					que.ps(mp(tnum, cnt + 1));
-				}
-				
-			}
-			
+		if(s == T) return path;
+		
+		// *
+		if(checkBnd(s * s) && st.count(s * s) == false){
+			que.ps(mp(s * s, path + "*"));
+		}
+		
+		// +
+		if(checkBnd(s + s) && st.count(s + s) == false){
+			que.ps(mp(s + s, path + "+"));
+		}
+		
+		// -
+		if(checkBnd(s - s) && st.count(s - s) == false){
+			que.ps(mp(s - s, path + "-"));
+		}
+		
+		// /
+		if(s == 0) continue;
+		if(checkBnd(s / s) && st.count(s / s) == false){
+			que.ps(mp(s / s, path + "/"));
 		}
 		
 	}
 	
-	return -1;
+	return "-1";
+	
 }
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	int cnt;
-	ci(cnt);
+	ci2(S, T);
 	
-	gen();
-	
-	while(cnt--){
-		
-		int src, dest;
-		
-		ci(src);
-		ci(dest);
-		
-		int res = BFS(src, dest);
-		
-		if(res != -1) col(res);
-		else col("impossible");
-		
+	if(S == T){
+		co(0); return 0;
 	}
+	else
+		co(BFS());
 	
 	return 0;
 }

@@ -62,65 +62,52 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 const int MAX = 2000000000;
 
 int R, C;
-int T[51][51][2501];
+int T[51][51];
 int W[51][51];
-vector<string> B(50);
+char B[51][51];
 queue<pii> waters;
 
 int hx, hy; // 고슴도치의 위치
 int bx, by; // 비버의 위치 
-int res = MAX;
-
-typedef struct _Node{
-	
-	int x, y, t;
-	
-} Node;
 
 int hogBFS(){
 	
-	queue<Node> que;
-	que.ps({ hx, hy, 0 });
-	T[hx][hy][0] = 0;
+	memset(T, -1, sizeof(T[0][0]) * 51 * 51);
+	
+	queue<pii> que;
+	que.ps(mp(hx, hy));
+	T[hx][hy] = 0;
 	
 	while(!que.emt()){
 		
-		Node cur = que.frt(); que.pp();
+		pii cur = que.frt(); que.pp();
 		
-		int x = cur.x;
-		int y = cur.y;
-		int t = cur.t;
-		
-		// 비버의 소굴에 도착
-		if(x == bx && y == by) {
-			res = min(res, T[x][y][t]);
-			continue;
-		}
+		int x = cur.fst;
+		int y = cur.scd;
 		
 		rep(i, 0, 4){
 		
 			int nx = x + dx[i];
 			int ny = y + dy[i];
-			int nt = t + 1;
 			
 			if(!bnd(nx, ny, R, C)) continue;
-			if(T[nx][ny][nt] > 0) continue; 
 			
+			// 이미 캐싱한 경우
+			if(T[nx][ny] != -1) continue; 
 			// 다음 위치가 돌인 경우 
 			if(B[nx][ny] == 'X') continue; 
-			// 다음 위치로 가면 다음에 물이 차는 경우 
-			if(W[nx][ny] == nt) continue;
-			// 다음 위치가 이미 물이 찬 구역인 경우 
-			if(W[nx][ny] <= t && W[nx][ny] >= 0) continue;
 			
-			que.ps({ nx, ny, nt });
-			T[nx][ny][nt] = T[x][y][t] + 1;
+			// 다음 위치에 이미 물이 차 있거나 다음에 물이 차는 경우 
+			if(W[nx][ny] != -1 && W[nx][ny] <= T[x][y] + 1) continue;
+			
+			que.ps(mp(nx, ny));
+			T[nx][ny] = T[x][y] + 1;
 			
 		}
 		
 	}
 
-	return res;	
+	return T[bx][by];	
 }
 
 void waterBFS(){
@@ -140,10 +127,11 @@ void waterBFS(){
 			if(!bnd(nx, ny, R, C)) continue;
 			
 			// 이전에 방문한 적이 없고 빈칸이어야함 
-			if(W[nx][ny] == -1 && B[nx][ny] == '.'){
-				W[nx][ny] = W[x][y] + 1;
-				waters.ps(mp(nx, ny));
-			}
+			if(W[nx][ny] != -1) continue;
+			if(B[nx][ny] == 'X' || B[nx][ny] == 'D') continue;
+		
+			W[nx][ny] = W[x][y] + 1;
+			waters.ps(mp(nx, ny));
 			
 		}
 		
@@ -157,12 +145,18 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
+	ci2(R, C); cig(99999);
 	memset(W, -1, sizeof(W[0][0]) * 51 * 51);
 	
-	ci2(R, C); cig(99999);
 	rep(i, 0, R){
-		gtl(B[i]);
+		
+		string row;
+		gtl(row);
+		
 		rep(j, 0, C){
+			
+			B[i][j] = row[j];
+			
 			// 비버 
 			if(B[i][j] == 'D'){
 				bx = i; by = j; 
@@ -176,6 +170,7 @@ int main(int argc, char** argv) {
 				waters.ps(mp(i, j));
 				W[i][j] = 0;
 			} 
+			
 		}
 	}
 	
@@ -184,7 +179,7 @@ int main(int argc, char** argv) {
 	
 	// 고슴도치로 BFS를 진행 
 	int res = hogBFS();
-	if(res != MAX) col(res);
+	if(res != -1) col(res);
 	else col("KAKTUS");
 	
 	return 0;
