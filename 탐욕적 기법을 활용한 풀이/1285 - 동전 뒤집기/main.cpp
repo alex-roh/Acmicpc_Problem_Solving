@@ -18,7 +18,6 @@ using namespace std;
 #define col(a) cout << a << '\n' // cout with line 
 #define cl cout << '\n' // cout only line
 
-// ofstream out
 #define fco(a) out << a
 #define fco(a) out << a
 #define fcos(a) out << a << ' '
@@ -35,7 +34,7 @@ using namespace std;
 
 typedef long long ll;
 typedef vector<int> vi;
-typedef vector<bool> vb;
+typedef vector<string> vs;
 typedef stack<int> si;
 typedef queue<int> qi;
 typedef deque<int> di;
@@ -44,59 +43,80 @@ typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti3;
 typedef tuple<int, int, int, int> ti4;
 
-typedef pair<ll, ll> pll;
-typedef vector<ll> vl;
-typedef tuple<ll, ll, ll> tl3;
-typedef tuple<ll, ll, ll, ll> tl4;
-typedef stack<ll> sl;
-typedef queue<ll> ql;
-typedef priority_queue<ll> pql;
-
 int dx[4] = { 0, 1, 0, -1 };
 int dy[4] = { 1, 0, -1, 0 };
 int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
+// ofstream out
 const int MAX = 2000000000;
 
-bool endTimeFirst(const pii &f, const pii &s) { 
-	if(f.scd == s.scd)
-		return (f.fst < s.fst);
-	else
-		return (f.scd < s.scd); 
-} 
+int N;
+vi c(21);
+char B[21][21];
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
+	// out.open("output.txt);
 	
-	int N; ci(N);
-	vector<pii> mtings(N);
+	ci(N); cig(99999);
 	
-	rep(i, 0, N){
-		int stt; int end;
-		ci2(stt, end);
-		mtings[i] = mp(stt, end);
-	}
-	
-	// 끝나는 시간을 기준으로 정렬 
-	sort(mtings.begin(), mtings.end(), endTimeFirst);
-	
-	int cnt = 0; int end = -1;
 	rep(i, 0, N){
 		
-		// 회의의 시작 시간이 끝나는 시간 이후에 있으면 
-		if(mtings[i].fst >= end){
+		string str;
+		gtl(str);
+		
+		rep(j, 0, N){
+		
+			B[i][j] = str[j];
+			if(B[i][j] == 'T') {
+				// 그 열에 있는 T의 개수 
+				c[j]++;
+			}
 			
-			end = mtings[i].scd;
-			cnt++;
+		}
+	}
+	
+	int res = MAX;
+	
+	// 뒤집을 행을 1로 나타내는 순열 패턴 생성 
+	rep(pattern, 0, (1 << 20)){
+		
+		// col 카피 
+		vi tc(c);
+	
+		rep(i, 0, N){
+			// 현재 뒤집을 행이라면 
+			if((pattern & (1 << i)) != 0){
+				rep(j, 0, N){
+					if(B[i][j] == 'T') tc[j]--;
+					else tc[j]++;
+				} 
+			}
 		}
 		
+		int sum = 0;
+		
+		// 뒤집을 열을 선택함 
+		rep(i, 0, N){
+			
+			// 뒤집을 때 T의 개수가 더 적어진다면 
+			if(abs(N - tc[i]) < tc[i])
+				sum += abs(N - tc[i]);
+			else
+				sum += tc[i];
+		
+		}
+		
+		res = min(res, sum);
+		
 	}
 	
-	cos(cnt);
+	col(res);
 	
+	// out.close();
 	return 0;
 }

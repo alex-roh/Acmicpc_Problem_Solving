@@ -35,7 +35,7 @@ using namespace std;
 
 typedef long long ll;
 typedef vector<int> vi;
-typedef vector<bool> vb;
+typedef vector<string> vs;
 typedef stack<int> si;
 typedef queue<int> qi;
 typedef deque<int> di;
@@ -44,14 +44,6 @@ typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti3;
 typedef tuple<int, int, int, int> ti4;
 
-typedef pair<ll, ll> pll;
-typedef vector<ll> vl;
-typedef tuple<ll, ll, ll> tl3;
-typedef tuple<ll, ll, ll, ll> tl4;
-typedef stack<ll> sl;
-typedef queue<ll> ql;
-typedef priority_queue<ll> pql;
-
 int dx[4] = { 0, 1, 0, -1 };
 int dy[4] = { 1, 0, -1, 0 };
 int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
@@ -59,12 +51,33 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
 
-bool endTimeFirst(const pii &f, const pii &s) { 
-	if(f.scd == s.scd)
-		return (f.fst < s.fst);
-	else
-		return (f.scd < s.scd); 
-} 
+int N, cnt;
+string A, B, storedA;
+
+void flip(int i){
+	if(A[i] == '0') A[i] = '1';
+	else A[i] = '0';
+}
+
+void on(int i){
+	
+	if(i == 0){
+		flip(0);
+		flip(1);
+	}
+	else if(i == A.size() - 1){
+		flip(A.size() - 1);
+		flip(A.size() - 2);
+	}
+	else{
+		flip(i - 1);
+		flip(i);
+		flip(i + 1);
+	}
+	
+	cnt++;
+	
+}
 
 int main(int argc, char** argv) {
 	
@@ -72,31 +85,47 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	int N; ci(N);
-	vector<pii> mtings(N);
+	int N;
+	ci(N); cig(99999);
 	
-	rep(i, 0, N){
-		int stt; int end;
-		ci2(stt, end);
-		mtings[i] = mp(stt, end);
+	gtl(A); gtl(B);
+	storedA = A;
+	
+	int pos = 0;
+	
+	// 같은 경우에 대한 예외 처리 
+	if(A == B) {
+		col(0);
+		return 0;
 	}
 	
-	// 끝나는 시간을 기준으로 정렬 
-	sort(mtings.begin(), mtings.end(), endTimeFirst);
+	// 두 경우를 생성
+	int res = MAX; 
 	
-	int cnt = 0; int end = -1;
-	rep(i, 0, N){
-		
-		// 회의의 시작 시간이 끝나는 시간 이후에 있으면 
-		if(mtings[i].fst >= end){
-			
-			end = mtings[i].scd;
-			cnt++;
-		}
-		
+	// 첫번째 스위치를 누르는 경우 
+	on(0);
+	rep(i, 1, N){
+		if(A[i - 1] != B[i - 1])
+			on(i);
 	}
 	
-	cos(cnt);
+	if(A == B)
+		res = cnt;
+	
+	// 첫번째 스위치를 누르지 않는 경우 
+	A = storedA; cnt = 0;
+	rep(i, 1, N){
+		if(A[i - 1] != B[i - 1])
+			on(i);
+	}
+	
+	if(A == B)
+		res = min(res, cnt);
+	
+	if(res != MAX)
+		col(res);
+	else 
+		col(-1);
 	
 	return 0;
 }

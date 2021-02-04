@@ -58,13 +58,8 @@ int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
-
-bool endTimeFirst(const pii &f, const pii &s) { 
-	if(f.scd == s.scd)
-		return (f.fst < s.fst);
-	else
-		return (f.scd < s.scd); 
-} 
+int N;
+int people[1001];
 
 int main(int argc, char** argv) {
 	
@@ -72,31 +67,25 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	int N; ci(N);
-	vector<pii> mtings(N);
+	ci(N);
+	rep(i, 0, N)
+		ci(people[i]);
 	
-	rep(i, 0, N){
-		int stt; int end;
-		ci2(stt, end);
-		mtings[i] = mp(stt, end);
+	// 인출 시간이 짧은 사람부터 
+	sort(people, people + N);
+
+	int total = 0;
+	int psum[1001] = {0};
+	
+	psum[0] = people[0];
+	total += psum[0];
+	
+	rep(i, 1, N){
+		psum[i] = psum[i - 1] + people[i];
+		total = total + psum[i];
 	}
 	
-	// 끝나는 시간을 기준으로 정렬 
-	sort(mtings.begin(), mtings.end(), endTimeFirst);
-	
-	int cnt = 0; int end = -1;
-	rep(i, 0, N){
-		
-		// 회의의 시작 시간이 끝나는 시간 이후에 있으면 
-		if(mtings[i].fst >= end){
-			
-			end = mtings[i].scd;
-			cnt++;
-		}
-		
-	}
-	
-	cos(cnt);
+	co(total);
 	
 	return 0;
 }

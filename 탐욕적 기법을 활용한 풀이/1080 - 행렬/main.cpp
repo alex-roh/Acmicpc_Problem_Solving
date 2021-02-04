@@ -58,13 +58,31 @@ int ddx[8] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 const int MAX = 2000000000;
+int N, M;
+vector<string> A;
+vector<string> B;
 
-bool endTimeFirst(const pii &f, const pii &s) { 
-	if(f.scd == s.scd)
-		return (f.fst < s.fst);
-	else
-		return (f.scd < s.scd); 
-} 
+void flip(int x, int y){
+	
+    rep(i, x, x + 3) {
+        rep(j, y, y + 3) {
+            A[i][j] = (A[i][j] == '0') ? '1' : '0';
+        }
+    }
+    
+}
+
+bool compareTwo(){
+	
+	rep(i, 0, N){
+		rep(j, 0, M){
+			if(A[i][j] != B[i][j])
+				return false;
+		}
+	}
+	
+	return true;
+}
 
 int main(int argc, char** argv) {
 	
@@ -72,31 +90,35 @@ int main(int argc, char** argv) {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	int N; ci(N);
-	vector<pii> mtings(N);
+	ci2(N, M); cig(99999);
 	
 	rep(i, 0, N){
-		int stt; int end;
-		ci2(stt, end);
-		mtings[i] = mp(stt, end);
+		string str; gtl(str);
+		A.pb(str);
 	}
 	
-	// 끝나는 시간을 기준으로 정렬 
-	sort(mtings.begin(), mtings.end(), endTimeFirst);
-	
-	int cnt = 0; int end = -1;
 	rep(i, 0, N){
-		
-		// 회의의 시작 시간이 끝나는 시간 이후에 있으면 
-		if(mtings[i].fst >= end){
+		string str; gtl(str);
+		B.pb(str);
+	}
+	
+	// 그리디 진행
+	int cnt = 0;
+	
+	rep(i, 0, N - 2){
+		rep(j, 0, M - 2){
 			
-			end = mtings[i].scd;
-			cnt++;
-		}
+			if(A[i][j] != B[i][j]){
+				// 3 * 3 행렬 뒤집기
+				flip(i, j);
+				cnt++;
+			}
 		
+		}
 	}
 	
-	cos(cnt);
+	if(compareTwo()) col(cnt);
+	else col(-1);
 	
 	return 0;
 }
