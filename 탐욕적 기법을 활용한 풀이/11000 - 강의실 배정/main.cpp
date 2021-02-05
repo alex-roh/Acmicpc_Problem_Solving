@@ -24,6 +24,7 @@ using namespace std;
 #define fcol(a) out << a << '\n' 
 #define fcl out << '\n'
 
+#define tp top
 #define frt front
 #define ps push
 #define pp pop
@@ -38,7 +39,7 @@ typedef vector<string> vs;
 typedef stack<int> si;
 typedef queue<int> qi;
 typedef deque<int> di;
-typedef priority_queue<int> pqi;
+typedef priority_queue<int, vector<int>> pqi;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti3;
 typedef tuple<int, int, int, int> ti4;
@@ -51,72 +52,58 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 // ofstream out
 const int MAX = 2000000000;
 
-int N;
-vi c(21);
-char B[21][21];
+typedef struct _Cls {
+	
+	int s, t;
+	
+} Cls;
+
+bool sortByS(Cls fst, Cls scd){
+	return fst.s < scd.s;
+}
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	// out.open("output.txt);
 	
-	ci(N); cig(99999);
+	int N;
+	ci(N);
+	vector<Cls> c(N);
+	
+	rep(i, 0, N){
+		int s, t;
+		ci2(s, t);
+		c[i] = {s, t};
+	}
+	
+	// 시작 시간이 이른 순으로 정렬 
+	sort(c.begin(), c.end(), sortByS);
+	
+	// 끝나는 시간이 이른 순으로 들어갈 우선순위 큐
+	priority_queue<int, vector<int>, greater<int>> pq; 
+	int res = 0;
 	
 	rep(i, 0, N){
 		
-		string str;
-		gtl(str);
+		int s = c[i].s;
+		int t = c[i].t;
 		
-		rep(j, 0, N){
-		
-			B[i][j] = str[j];
-			if(B[i][j] == 'T') {
-				// 그 열에 있는 T의 개수 
-				c[j]++;
-			}
-			
+		if(pq.emt() || s < pq.tp()){
+			pq.ps(t);
 		}
-	}
-	
-	int res = MAX;
-	
-	// 뒤집을 행을 1로 나타내는 순열 패턴 생성 
-	rep(pattern, 0, (1 << 20)){
-		
-		// col 카피 
-		vi tc(c);
-	
-		rep(i, 0, N){
-			// 현재 뒤집을 행이라면 
-			if((pattern & (1 << i)) != 0){
-				rep(j, 0, N){
-					if(B[i][j] == 'T') tc[j]--;
-					else tc[j]++;
-				} 
-			}
+		else {
+			pq.pp();
+			pq.ps(t);
 		}
-		
-		int sum = 0;
-		
-		// 뒤집을 열을 선택함 
-		rep(i, 0, N){
-			
-			// 뒤집을 때 T의 개수가 더 적어진다면 
-			if(abs(N - tc[i]) < tc[i])
-				sum += abs(N - tc[i]);
-			else
-				sum += tc[i];
-		
-		}
-		
-		res = min(res, sum);
 		
 	}
 	
-	col(res);
+	col(pq.size());
 	
 	// out.close();
 	return 0;
 }
+

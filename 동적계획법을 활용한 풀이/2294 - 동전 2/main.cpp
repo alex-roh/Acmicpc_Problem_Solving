@@ -11,7 +11,7 @@ int C[101];
 
 int N, K;
 
-void DFS(int amount){
+void bruteforce(int amount){
 	
 	if(amount >= K){
 		return;
@@ -28,7 +28,7 @@ void DFS(int amount){
 			// toBeAmount를 만들어봐야 하는 경우 
 			else {
 				D[toBeAmount] = D[amount] + 1;
-				DFS(toBeAmount);
+				bruteforce(toBeAmount);
 			}
 		}
 	}
@@ -37,15 +37,14 @@ void DFS(int amount){
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 
 	cin >> N >> K;
 	
 	for(int i = 1; i <= N; i++){
-		int amt;
-		cin >> amt;
+		int amt; cin >> amt;
 		C[i] = amt;
 		D[C[i]] = 1;
 	}
@@ -54,7 +53,7 @@ int main(int argc, char** argv) {
 	sort(C + 1, C + N + 1, greater<int>());
 	
 	for(int i = 1; i <= N; i++)
-		DFS(C[i]);
+		bruteforce(C[i]);
 	
 	if(D[K] == INT_MAX)
 		cout << -1;
