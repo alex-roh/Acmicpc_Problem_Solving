@@ -51,17 +51,6 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 // ofstream out
 const int MAX = 2000000000;
-bool isToBeUsed[101];
-
-void printPlug(set<int> &plugs){
-	
-	cos("plugs =");
-	for(auto x : plugs){
-		cos(x);
-	}	
-	cl;
-	
-}
 
 int main(int argc, char** argv) {
 	
@@ -70,70 +59,26 @@ int main(int argc, char** argv) {
 	cin.tie(NULL);
 	// out.open("output.txt);
 	
-	int N, K;
-	ci2(N, K);
-	
-	vi names;
-	set<int> plugs;
-	
-	rep(i, 0, K){
-		int e; ci(e);
-		names.pb(e);
+	int N; ci(N); 
+	vi ropes;
+	rep(i, 0, N){
+		int r; ci(r);
+		ropes.pb(r);
 	}
 	
-	int cnt = 0;
+	sort(ropes.begin(), ropes.end(), greater<int>());
 	
-	rep(i, 0, K){
+	int k = 1; int res = -1;
+	
+	rep(i, 0, N){
 		
-		int e = names[i];
-		
-		// 멀티탭에 꽂혀 있는 경우 
-		if(plugs.count(e)) {
-			continue;
-		}
-		
-		// 멀티탭에 꽂을 수 있는 경우 
-		if(plugs.size() < N){
-			plugs.insert(e);
-			continue;
-		}
-		
-		// names[i]를 넣기 위해 멀티탭에서 반드시 하나를 빼야 하는 경우			
-		if(plugs.size() == N){
-			
-			int last = -1;
-			rep(j, i + 1, K){
-				
-				if(plugs.count(names[j]) && !isToBeUsed[names[j]]){
-					isToBeUsed[names[j]] = true;
-					last = names[j];
-				}
-				
-			}
-			
-			bool isNever = false;
-			for(auto x : plugs){
-				if(!isToBeUsed[x]){
-					plugs.erase(x);
-					isNever = true;
-					break;
-				}
-			}
-			
-			if(isNever == false)
-				plugs.erase(last);
-			
-			memset(isToBeUsed, false, sizeof(isToBeUsed));
-			plugs.insert(e);
-			cnt++;
-			
-		}
+		res = max(res, ropes[i] * k);	
+		k++;
 		
 	}
-
-	col(cnt);
+	
+	col(res);
 	
 	// out.close();
 	return 0;
 }
-
