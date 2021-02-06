@@ -6,7 +6,7 @@ using namespace std;
 #define prt(arr,N,M) cl; rep(i, 0, N){ rep(j, 0, M){ cos(arr[i][j]); } cl; } cl;
 
 #define rep(i,a,b) for(int i = a; i < b; i++)
-#define rrep(i,b,a) for(int i = b - 1; i >= a; i--)
+#define rrep(i,b,a) for(int i = b; i >= a; i--)
 #define mp(a,b) make_pair(a, b)
 
 #define cig(a) cin.ignore(a, '\n')
@@ -51,56 +51,87 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 // ofstream out
 const int MAX = 2000000000;
+bool isToBeUsed[101];
 
-typedef struct _Cls {
+void printPlug(set<int> &plugs){
 	
-	int s, t;
+	cos("plugs =");
+	for(auto x : plugs){
+		cos(x);
+	}	
+	cl;
 	
-} Cls;
-
-bool sortByS(Cls fst, Cls scd){
-	return fst.s < scd.s;
 }
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	// out.open("output.txt);
 	
-	int N;
-	ci(N);
-	vector<Cls> c(N);
+	int N, K;
+	ci2(N, K);
 	
-	rep(i, 0, N){
-		int s, t;
-		ci2(s, t);
-		c[i] = {s, t};
+	vi names;
+	set<int> plugs;
+	
+	rep(i, 0, K){
+		int e; ci(e);
+		names.pb(e);
 	}
 	
-	// 시작 시간이 이른 순으로 정렬 
-	sort(c.begin(), c.end(), sortByS);
+	int cnt = 0;
 	
-	// 끝나는 시간이 이른 순으로 들어갈 우선순위 큐
-	priority_queue<int, vector<int>, greater<int>> pq; 
-	
-	rep(i, 0, N){
+	rep(i, 0, K){
 		
-		int s = c[i].s;
-		int t = c[i].t;
+		int e = names[i];
 		
-		if(pq.emt() || s < pq.tp()){
-			pq.ps(t);
+		// 멀티탭에 꽂혀 있는 경우 
+		if(plugs.count(e)) {
+			continue;
 		}
-		else {
-			pq.pp();
-			pq.ps(t);
+		
+		// 멀티탭에 꽂을 수 있는 경우 
+		if(plugs.size() < N){
+			plugs.insert(e);
+			continue;
+		}
+		
+		// names[i]를 넣기 위해 멀티탭에서 반드시 하나를 빼야 하는 경우			
+		if(plugs.size() == N){
+			
+			int last = -1;
+			rep(j, i + 1, K){
+				
+				if(plugs.count(names[j]) && !isToBeUsed[names[j]]){
+					isToBeUsed[names[j]] = true;
+					last = names[j];
+				}
+				
+			}
+			
+			bool isNever = false;
+			for(auto x : plugs){
+				if(!isToBeUsed[x]){
+					plugs.erase(x);
+					isNever = true;
+					break;
+				}
+			}
+			
+			if(isNever == false)
+				plugs.erase(last);
+			
+			memset(isToBeUsed, false, sizeof(isToBeUsed));
+			plugs.insert(e);
+			cnt++;
+			
 		}
 		
 	}
-	
-	col(pq.size());
+
+	col(cnt);
 	
 	// out.close();
 	return 0;
