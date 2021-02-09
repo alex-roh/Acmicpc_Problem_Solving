@@ -55,58 +55,62 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 // ofstream out
 const int MAX = 2000000000;
+int N;
+int res;
 
-typedef struct _Cube {
+int oc; // one count
+
+void mult(vi& v){
 	
-	int type;
-	int cnt;
-	
-} Cube;
+	for(int i = 0; i + 1 < v.size(); i += 2)
+		res += v[i] * v[i + 1];
+		
+}
 
 int main(int argc, char** argv) {
 	
-	// freopen("input.txt", "rt", stdin);
+	freopen("input.txt", "rt", stdin);
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 	// out.open("output.txt);
 	
-	int len, wid, hei; 
-	ci2(len, wid); ci(hei);
+	ci(N);
 	
-	int N; ci(N);
-	vector<Cube> cubes(N);
-	
-	rep(i, 0, N){
-		int a, b;
-		ci2(a, b);
-		cubes[i] = { a, b };
-	}
-	
-	reverse(cubes.begin(), cubes.end());
-	
-	ll usedCube = 0;
-	ll usedCubeAmount = 0;
+	vi minus;
+	vi zero;
+	vi plus;
 	
 	rep(i, 0, N){
 		
-		usedCube = usedCube << 3; // 더 작은 단위로 쪼갰을 때 큐브의 사용 개수 
+		int t; ci(t);
 		
-		int type = cubes[i].type;
-		int cnt = cubes[i].cnt;
+		if(t > 0) plus.pb(t);
+		if(t == 1) oc++;
+		if(t == 0) zero.pb(t);
+		if(t < 0) minus.pb(t);
 		
-		ll cubesToBeUsed = (ll) (len >> type) * (wid >> type) * (hei >> type);
-		ll actualCubeToBeUsed = min((ll)cnt, cubesToBeUsed - usedCube); // cnt 이상 사용 불가능 
-		
-		usedCube += actualCubeToBeUsed;
-		usedCubeAmount += actualCubeToBeUsed;
-		
-	}
+	} 
 	
-	// 1 x 1 x 1까지 쪼갰을 때 개수가 부피와 같다면 
-	if(usedCube == (ll) len * wid * hei)
-		co(usedCubeAmount);
-	else
-		co(-1);
+	sort(minus.begin(), minus.end());
+	sort(plus.begin(), plus.end(), greater<int>());	
+	
+	// 1의 개수만큼 더해줌 
+	res = oc;
+	
+	// 음수  
+	mult(minus);
+	// 0이 없으면서 마지막 한 원소가 남는 경우 
+	if(zero.empty() && minus.size() % 2 != 0)
+		res += minus.back();
+	
+	// 양수 
+	mult(plus);
+	// 마지막 한 원소가 남는 경우 
+	if(plus.size() % 2 != 0)
+		res += plus.back();
+	
+	// 양수의 경우 합이 곱보다 클 수 있음 
+	col(res);
 	
 	// out.close();
 	return 0;

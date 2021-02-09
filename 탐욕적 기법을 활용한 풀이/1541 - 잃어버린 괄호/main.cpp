@@ -56,13 +56,6 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 // ofstream out
 const int MAX = 2000000000;
 
-typedef struct _Cube {
-	
-	int type;
-	int cnt;
-	
-} Cube;
-
 int main(int argc, char** argv) {
 	
 	// freopen("input.txt", "rt", stdin);
@@ -70,43 +63,37 @@ int main(int argc, char** argv) {
 	cin.tie(NULL);
 	// out.open("output.txt);
 	
-	int len, wid, hei; 
-	ci2(len, wid); ci(hei);
+	string str; gtl(str);
+	int N = str.size();
 	
-	int N; ci(N);
-	vector<Cube> cubes(N);
+	int res = 0;
+	bool isStart = false;
+	int num = 0;
+	int numFromStart = 0;
 	
-	rep(i, 0, N){
-		int a, b;
-		ci2(a, b);
-		cubes[i] = { a, b };
-	}
-	
-	reverse(cubes.begin(), cubes.end());
-	
-	ll usedCube = 0;
-	ll usedCubeAmount = 0;
-	
-	rep(i, 0, N){
+	rep(i, 0, N + 1){
 		
-		usedCube = usedCube << 3; // 더 작은 단위로 쪼갰을 때 큐브의 사용 개수 
+		if(i == N || str[i] == '+' || str[i] == '-'){
+			
+			if(isStart)
+				res -= num;
+			else 
+				res += num;
+			
+			if(i < N && !isStart && str[i] == '-')
+				isStart = true;
+			
+			num = 0;
+			
+			continue;
+		}
 		
-		int type = cubes[i].type;
-		int cnt = cubes[i].cnt;
-		
-		ll cubesToBeUsed = (ll) (len >> type) * (wid >> type) * (hei >> type);
-		ll actualCubeToBeUsed = min((ll)cnt, cubesToBeUsed - usedCube); // cnt 이상 사용 불가능 
-		
-		usedCube += actualCubeToBeUsed;
-		usedCubeAmount += actualCubeToBeUsed;
+		if(isdigit(str[i]))
+			num = num * 10 + (int)(str[i] - '0');
 		
 	}
 	
-	// 1 x 1 x 1까지 쪼갰을 때 개수가 부피와 같다면 
-	if(usedCube == (ll) len * wid * hei)
-		co(usedCubeAmount);
-	else
-		co(-1);
+	col(res);
 	
 	// out.close();
 	return 0;
