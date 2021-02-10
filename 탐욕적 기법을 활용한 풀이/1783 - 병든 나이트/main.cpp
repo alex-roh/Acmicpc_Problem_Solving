@@ -56,12 +56,32 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 // ofstream out
 const int MAX = 2000000000;
 
-int main() {
+int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	// out.open("output.txt);
 	
-	string str; gtl(str);
-	col(str.size());
+	int H, W;
+
+    ci2(H, W);
+
+    if (H == 1) 
+        col(1);
+    
+	else if (H == 2)
+		col(min(4, (W + 1) / 2));
 	
-    return 0;
+	else if (H >= 3){
+	
+        if (W >= 7)
+            col(W - 2);
+        else
+            col(min(4, W));
+	
+	}
+	
+	// out.close();
+	return 0;
 }

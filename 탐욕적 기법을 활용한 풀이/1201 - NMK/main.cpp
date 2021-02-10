@@ -56,12 +56,72 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 // ofstream out
 const int MAX = 2000000000;
 
-int main() {
+int N, M, K;
+vi group[501];
+
+void print(){
 	
-	freopen("input.txt", "rt", stdin);
+	rep(i, 0, M){
+		reverse(group[i].begin(), group[i].end());
+		for(auto x : group[i])
+			cos(x);
+	}
 	
-	string str; gtl(str);
-	col(str.size());
+}
+
+int main(int argc, char** argv) {
 	
-    return 0;
+	// freopen("input.txt", "rt", stdin);
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	// out.open("output.txt);
+	
+	ci2(N, M); ci(K);
+	
+	// 불가능한 경우 -1
+	if(N - M + 1 < K || M * K < N){
+		col(-1);
+		return 0;
+	} 
+	
+	vi num(N);
+	rep(i, 0, N)
+		num[i] = i + 1;
+		
+	// 1. K개가 들어있는 그룹으로 묶음 
+	int gi = 0;
+	rep(i, 0, K){
+		group[gi].pb(num[i]);
+	}
+	
+	gi++;
+	
+	// 2. N - K개에서 M - 1개의 그룹을 만듦
+	if(M - 1 == 0){
+		print();
+		return 0;
+	} 
+	
+	int s = (N - K) / (M - 1);
+	int r = (N - K) % (M - 1);
+	
+	int i = K;
+	while(i < N){
+		
+		int ns = s + (r > 0 ? 1 : 0); // 나머지가 있는 경우 s에 1을 더함
+		int cnt = 0;
+		
+		while(cnt < ns){
+			group[gi].pb(num[i]);
+			i++; cnt++;
+		}
+		
+		gi++; r--;
+	
+	}
+	
+	print();
+	
+	// out.close();
+	return 0;
 }

@@ -56,12 +56,38 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 // ofstream out
 const int MAX = 2000000000;
 
-int main() {
+int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	// out.open("output.txt);
 	
-	string str; gtl(str);
-	col(str.size());
+	string str; ci(str);
 	
-    return 0;
+	bool isZero = false;
+	int sum = 0;
+	
+	for(auto& c : str){
+	
+		if(c == '0'){
+			isZero = true;
+			continue;
+		}
+		
+		sum += c - '0';
+	
+	}
+	
+	if(isZero && sum % 3 == 0){
+		
+		sort(str.begin(), str.end(), greater<char>());
+		co(str);
+		
+	}
+	else 
+		co(-1);
+	
+	// out.close();
+	return 0;
 }

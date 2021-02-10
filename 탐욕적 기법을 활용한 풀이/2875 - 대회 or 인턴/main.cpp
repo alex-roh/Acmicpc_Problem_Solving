@@ -55,13 +55,35 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 // ofstream out
 const int MAX = 2000000000;
+int M, N, K;
 
-int main() {
+int main(int argc, char** argv) {
 	
-	freopen("input.txt", "rt", stdin);
+	// freopen("input.txt", "rt", stdin);
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	// out.open("output.txt);
 	
-	string str; gtl(str);
-	col(str.size());
+	ci2(N, M); ci(K);
+	int k = 0;
 	
-    return 0;
+	while(k != K){
+		
+		if(N / 2 >= M){
+			// 여학생에서 데려옴 
+			k++; N--;
+		}
+		else if(N / 2 < M){
+			// 남학생에서 데려옴 
+			k++; M--;
+		}
+		
+	}
+	
+	if(N != 0)
+		co(min(N / 2, M));
+	else co(0);
+		
+	// out.close();
+	return 0;
 }

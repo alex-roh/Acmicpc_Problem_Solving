@@ -55,13 +55,76 @@ int ddy[8] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 
 // ofstream out
 const int MAX = 2000000000;
+int N, K;
 
-int main() {
+void prtAns(int b, vi& cnt){
 	
-	freopen("input.txt", "rt", stdin);
+	int i;
 	
-	string str; gtl(str);
-	col(str.size());
+	for(i = 0; i < b; i++){
+		
+		while(cnt[i]--)
+			co('A');
+		co('B');
+		
+	}
 	
-    return 0;
+	// 맨 마지막 A를 출력 
+	while(cnt[i]--)
+		co('A');
+	
+}
+
+int main(int argc, char** argv) {
+	
+	// freopen("input.txt", "rt", stdin);
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	// out.open("output.txt);
+	
+	ci2(N, K);
+	
+	// 예외 처리 
+	if(K == 0){
+		rep(i, 0, N - 1)
+			co("B");
+		co("A");
+		return 0;
+	}
+	
+	rep(i, 0, N + 1){
+		
+		int a = i;
+		int b = N - a;
+		
+		if(a * b < K) continue;
+		
+		vi cnt(b + 1); // B 사이에 넣을 A의 개수 
+		
+		// A를 어디에, 몇 개 넣을 것인지 그리디하게 결정 
+		rep(j, 0, b + 1){
+			
+			int sub = b - j;
+			
+			while(K > 0){
+				if(K - sub < 0) break;
+				K -= sub;
+				cnt[j]++;
+				a--;
+			}
+			
+			if(K == 0){
+				cnt[b] = a;
+				prtAns(b, cnt);
+				return 0;			
+			}
+		
+		}
+
+	}
+	
+	col(-1);
+	
+	// out.close();
+	return 0;
 }
